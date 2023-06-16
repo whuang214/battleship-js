@@ -1,0 +1,60 @@
+body {
+  font-family: 'Press Start 2P', cursive;
+  box-sizing: border-box;
+  border: 0.5px solid red;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none; 
+    flex-direction: column; /* align items vertically, in this case */
+    justify-content: center; /* center items vertically, in this case */
+    align-items: center; /* center items horizontally, in this case */
+    z-index: 999; /* on top of everything */
+  }
+  
+  .overlay h1 {
+    color: #fff;
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  
+  .overlay button {
+    padding: 10px 20px;
+    font-size: 18px;
+  }
+
+  .game-container {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .game-container .board-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .game-container .board-container .player-board,
+  .game-container .board-container .computer-board{ 
+    background-color: #006994;
+    grid-template-columns: repeat(10, 4.5vmin);
+    grid-template-rows: repeat(10, 4.5vmin);
+    margin: 2vmin;
+    display: grid;
+  }
+
+  .game-container .board-container .computer-board div, 
+  .game-container .board-container .player-board div {
+    border: 0.2px solid rgba(255, 255, 255, 0.2);
+  }
+
+
+
+  
