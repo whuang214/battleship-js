@@ -1,7 +1,10 @@
+* {
+  border: 0.5px solid red;
+  box-sizing: border-box;
+}
+
 body {
   font-family: 'Press Start 2P', cursive;
-  box-sizing: border-box;
-  border: 0.5px solid red;
 }
 
 .overlay {
@@ -43,7 +46,7 @@ body {
 
   .game-container .board-container .player-board,
   .game-container .board-container .computer-board{ 
-    background-color: #006994;
+    background-color: #3498DB;
     grid-template-columns: repeat(10, 4.5vmin);
     grid-template-rows: repeat(10, 4.5vmin);
     margin: 2vmin;
@@ -52,8 +55,79 @@ body {
 
   .game-container .board-container .computer-board div, 
   .game-container .board-container .player-board div {
-    border: 0.2px solid rgba(255, 255, 255, 0.2);
+    border: 0.2px solid rgba(255, 255, 255, 0.3);
   }
+
+  .game-container .board-container .computer-board div:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+  }
+  
+  .button-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    width: 100%;
+  }
+
+  .ships-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    width: 100%;
+  }
+
+  .ship {
+    width: 40px;
+    height: 40px;
+    background-color: gray;
+    border: 0.2px solid rgba(255, 255, 255, 0.3);
+    margin: 2px;
+  }
+
+  .carrier-horizontal {
+    width: 160px;
+  }
+
+  .carrier-vertical {
+    height: 160px;
+  }
+
+  .battleship-horizontal {
+    width: 120px;
+  }
+
+  .battleship-vertical {
+    height: 120px;
+  }
+
+  .cruiser-horizontal {
+    width: 160px;
+  }
+
+  .cruiser-vertical {
+    height: 160px;
+  }
+
+  .submarine-horizontal {
+    width: 120px;
+  }
+
+  .submarine-vertical {
+    height: 120px;
+  }
+
+  .destroyer-horizontal {
+    width: 80px;
+  }
+
+  .destroyer-vertical {
+    height: 80px;
+  }
+
+  
+
+
+
 
 
 
