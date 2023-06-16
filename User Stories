@@ -57,6 +57,7 @@
 3 As a User, I want the ships to be round on the game board. (optional)
 3 As a User, I want to animate the ships when they are hit. (optional)
 3 As a User, I want to animate the ships when they are sunk. (optional)
+5 As a User, I want everything to be responsive when scaled to different screen sizes. (optional)
 
 
 https://wireframe.cc/eUDVnj
