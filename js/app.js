@@ -139,7 +139,7 @@ function handleClick(e) {
   draggedShip.focus(); 
 }
 
-function rotateShip() {
+function rotateShip() { // TODO: allow rotation for all ships
   if (draggedShip.classList.contains("carrier-horizontal")) {
     draggedShip.classList.remove("carrier-horizontal");
     draggedShip.classList.add("carrier-vertical");
@@ -150,11 +150,13 @@ function rotateShip() {
 }
 
 function dragStart(e) {
-  draggedShip.style.border = "none";
+  if (draggedShip) {
+    draggedShip.style.border = "none";
+  }
   draggedShip = e.target;
 }
 
-function dragDrop(e) {
+function dragDrop(e) { // TODO: fix bug where ship can be placed outside of board
   e.target.append(draggedShip);
 }
 
