@@ -124,19 +124,19 @@ body {
 }
 
 .battleship.horizontal {
-  width: 120px;
-}
-
-.battleship.vertical {
-  height: 120px;
-}
-
-.cruiser.horizontal {
   width: 160px;
 }
 
-.cruiser.vertical {
+.battleship.vertical {
   height: 160px;
+}
+
+.cruiser.horizontal {
+  width: 120px;
+}
+
+.cruiser.vertical {
+  height: 120px;
 }
 
 .submarine.horizontal {
