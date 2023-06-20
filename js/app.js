@@ -109,13 +109,22 @@ function render() {
 }
 
 function renderBoard(board) {
-  // loop through board
-  // get each square
-  // set the class of the square to the state of the square
-  // empty, ship, hit, miss
-  // on miss and hit, add a class to show the red or white circle
-  // on ship add a class to show the ship
-  // update the DOM
+  // loop through the board
+  // get the dom element
+  // update the dom with the board state
+
+  for (let i = 0; i < board.length; i++) {
+    // loop through the board
+    for (let j = 0; j < board[i].length; j++) {
+      const square = board[i][j];
+      // get the dom element
+      const div = document.getElementById(`player-${i}-${j}`); 
+      // update the dom with the board state
+      div.classList.remove("empty", "ship", "hit", "miss");
+      div.classList.add(square.state);
+    }
+  }
+
 }
 
 function handleKeyPress(e) {
@@ -140,12 +149,12 @@ function handleClick(e) {
 }
 
 function rotateShip() { // TODO: allow rotation for all ships
-  if (draggedShip.classList.contains("carrier-horizontal")) {
-    draggedShip.classList.remove("carrier-horizontal");
-    draggedShip.classList.add("carrier-vertical");
+  if (draggedShip.classList.contains("horizontal")) {
+    draggedShip.classList.remove("horizontal");
+    draggedShip.classList.add("vertical");
   } else {
-    draggedShip.classList.remove("carrier-vertical");
-    draggedShip.classList.add("carrier-horizontal");
+    draggedShip.classList.remove("vertical");
+    draggedShip.classList.add("horizontal");
   }
 }
 
@@ -157,7 +166,23 @@ function dragStart(e) {
 }
 
 function dragDrop(e) { // TODO: fix bug where ship can be placed outside of board
-  e.target.append(draggedShip);
+  e.preventDefault();
+  // check which orientation the ship is in
+  // check if the ship can be placed in the square (check if the ship will fit)
+  // update the surrounding squares with the ship state
+  // update the square with the ship state
+  const square = e.target;
+  const x = square.id.split("-")[1];
+  const y = square.id.split("-")[2];
+
+  // check if the ship can be placed in the square (check if the ship will fit)
+  // change the state of the square to ship plus the surrounding squares
+
+
+  render();
+
+
+
 }
 
 function dragOver(e) {
