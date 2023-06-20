@@ -62,6 +62,15 @@ body {
   margin: 0;
 }
 
+.game-container .board-container .computer-board div .ship,
+.game-container .board-container .player-board div .ship {
+  width: 100%;
+  height: 100%;
+  background-color: gray;
+  border-radius: 50px;
+}
+
+
 .game-container .board-container .computer-board div:hover {
   background-color: rgba(255, 255, 255, 0.3);
 }
@@ -69,9 +78,9 @@ body {
 .bottom-container {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-around;
   width: 100%;
-  height: 20vh;
+  height: 50vh;
   background-color: #2c3e50;
 }
 
@@ -80,6 +89,12 @@ body {
   flex-direction: row;
   justify-content: space-evenly;
   width: 100%;
+}
+
+.button-container button {
+  padding: 10px 20px;
+  font-size: 18px;
+  cursor: pointer;
 }
 
 .ships-container {
@@ -100,42 +115,42 @@ body {
   cursor: pointer;
 }
 
-.carrier-horizontal {
-  width: 160px;
+.carrier.horizontal {
+  width: 200px;
 }
 
-.carrier-vertical {
-  height: 160px;
+.carrier.vertical {
+  height: 200px;
 }
 
-.battleship-horizontal {
+.battleship.horizontal {
   width: 120px;
 }
 
-.battleship-vertical {
+.battleship.vertical {
   height: 120px;
 }
 
-.cruiser-horizontal {
+.cruiser.horizontal {
   width: 160px;
 }
 
-.cruiser-vertical {
+.cruiser.vertical {
   height: 160px;
 }
 
-.submarine-horizontal {
+.submarine.horizontal {
   width: 120px;
 }
 
-.submarine-vertical {
+.submarine.vertical {
   height: 120px;
 }
 
-.destroyer-horizontal {
+.destroyer.horizontal {
   width: 80px;
 }
 
-.destroyer-vertical {
+.destroyer.vertical {
   height: 80px;
 }
