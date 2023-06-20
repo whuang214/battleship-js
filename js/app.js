@@ -7,7 +7,6 @@ let turn = 1; // 1 = player, -1 = computer
 
 const state = {
   EMPTY: "empty",
-  SHIP: "ship",
   HIT: "hit",
   MISS: "miss",
 };
@@ -37,15 +36,27 @@ class Square {
     this.x = x;
     this.y = y;
     this.state = state.EMPTY;
+    this.ship = null;
   }
+}
+
+const allShips = {
+  carrier: new Ship("carrier", 5),
+  battleship: new Ship("battleship", 4),
+  cruiser: new Ship("cruiser", 3),
+  submarine: new Ship("submarine", 3),
+  destroyer: new Ship("destroyer", 2),
+};
+
+function findShip(name) {
+  return allShips[name];
 }
 
 /*----- state variables -----*/
 let playerBoard = [];
 let computerBoard = [];
 
-let draggedShip;
-let draggedShipLength;
+let focusedShip; // the e.target of the ship being interacted with
 
 /*----- cached elements  -----*/
 const ships = document.querySelectorAll(".ship");
@@ -106,7 +117,7 @@ function initBoard(board) {
 
 function render() {
   renderBoard(playerBoard);
-  renderBoard(computerBoard);
+  // renderBoard(computerBoard);
 }
 
 function renderBoard(board) {
@@ -121,8 +132,19 @@ function renderBoard(board) {
       // get the dom element
       const div = document.getElementById(`player-${i}-${j}`); 
       // update the dom with the board state
-      div.classList.remove("empty", "ship", "hit", "miss");
-      div.classList.add(square.state);
+      div.classList.remove(...div.classList);
+      if (square.ship !== null) {
+        div.classList.add("ship");
+        div.classList.add(square.ship.name);
+        if (square.state === state.HIT) {
+          div.classList.add(state.HIT);
+          console.log("hit");
+        }
+        console.log(square.ship.name);
+      }
+      else {
+        div.classList.add(square.state);
+      }
     }
   }
 
@@ -137,28 +159,27 @@ function handleKeyPress(e) {
 }
 
 function handleClick(e) {
-  if (draggedShip && draggedShip === e.target) {
+  if (focusedShip && focusedShip === e.target) {
     return;
   }
-  if (draggedShip && draggedShip.style.border === "2px solid black") {
-    draggedShip.style.border = "none";
+  if (focusedShip && focusedShip.style.border === "2px solid black") {
+    focusedShip.style.border = "none";
   }
   console.log(e.target);
-  draggedShip = e.target;
-  draggedShip.style.border = "2px solid black";
-  draggedShip.focus(); 
+  focusedShip = e.target;
+  focusedShip.style.border = "2px solid black";
+  focusedShip.focus(); 
 }
 
 function rotateShip() { // TODO: allow rotation for all ships
-  if (draggedShip.classList.contains("horizontal")) {
-    draggedShip.classList.remove("horizontal");
-    draggedShip.classList.add("vertical");
+  if (focusedShip.classList.contains("horizontal")) {
+    focusedShip.classList.remove("horizontal");
+    focusedShip.classList.add("vertical");
   } else {
-    draggedShip.classList.remove("vertical");
-    draggedShip.classList.add("horizontal");
+    focusedShip.classList.remove("vertical");
+    focusedShip.classList.add("horizontal");
   }
 }
-
 
 /**
  * Returns the length of the ship based on its name.
@@ -184,38 +205,30 @@ function lengthOfShip(ship) {
 }
 
 function dragStart(e) {
-  if (draggedShip) {
-    draggedShip.style.border = "none";
+  if (focusedShip) {
+    focusedShip.style.border = "none";
   }
-  draggedShip = e.target;
+  focusedShip = e.target;
 
 }
 
 function dragDrop(e) { // TODO: fix bug where ship can be placed outside of board
   e.preventDefault();
-  // check which orientation the ship is in
-  // check if the ship can be placed in the square (check if the ship will fit)
-  // update the surrounding squares with the ship state
-  // update the square with the ship state
-  const square = e.target;
+
+  const square = e.target; 
   const row = parseInt(square.id.split("-")[1]);
   const column = parseInt(square.id.split("-")[2]);
 
-  console.log(row, column);
-
-  // check if the ship can be placed in the square (check if the ship will fit)
-  // change the state of the square to ship plus the surrounding squares
-
-  const shipOrientation = draggedShip.classList[2];
-  const shipLength = lengthOfShip(draggedShip.classList[1]);
+  const shipOrientation = focusedShip.classList[2];
+  const shipLength = lengthOfShip(focusedShip.classList[1]);
 
   for (let i = 0; i < shipLength; i++) {
     if (shipOrientation === "horizontal") {
-      if (column + i > 9 || playerBoard[row][column + i].state === state.SHIP) {
+      if (column + i > 9 || playerBoard[row][column + i].ship !== null) {
         return;
       }
     } else if (shipOrientation === "vertical") { // vertical
-      if (row + i > 9 || playerBoard[row + i][column].state === state.SHIP) {
+      if (row + i > 9 || playerBoard[row + i][column].ship !== null) {
         return;
       }
     }
@@ -224,7 +237,29 @@ function dragDrop(e) { // TODO: fix bug where ship can be placed outside of boar
     }
   }
 
-  e.target.appendChild(draggedShip);
+  // iterate through the board and remove occurances of the ship if it is already placed
+  for (let i = 0; i < playerBoard.length; i++) {
+    for (let j = 0; j < playerBoard[i].length; j++) {
+      if (playerBoard[i][j].ship === findShip(focusedShip.classList[1])) {
+        playerBoard[i][j].ship = null;
+        playerBoard[i][j].state = state.EMPTY;
+      }
+    }
+  }
+
+  for (let i = 0; i < shipLength; i++) {
+    if (shipOrientation === "horizontal") {
+      playerBoard[row][column + i].ship = findShip(focusedShip.classList[1]);
+
+    } else if (shipOrientation === "vertical") { // vertical
+      playerBoard[row + i][column].state = findShip(focusedShip.classList[1]);
+    }
+    else {
+      console.log("What kind of edge case is this?");
+    }
+  }
+
+  e.target.appendChild(focusedShip);
 
   render();
 
@@ -233,16 +268,6 @@ function dragDrop(e) { // TODO: fix bug where ship can be placed outside of boar
 
 function dragOver(e) {
   e.preventDefault();
-}
-
-function printPlayerboard() {
-  for (let i = 0; i < playerBoard.length; i++) {
-    let row = "";
-    for (let j = 0; j < playerBoard[i].length; j++) {
-      row += playerBoard[i][j].state + " ";
-    }
-    console.log(row);
-  }
 }
 
 initGame();
