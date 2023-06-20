@@ -5,6 +5,9 @@ console.log("app.js loaded");
 let winner = 0; // 0 = no winner, 1 = player, -1 = computer
 let turn = 1; // 1 = player, -1 = computer
 
+/**
+ * Represents the state of a square on the game board.
+ */
 const state = {
   EMPTY: "empty",
   HIT: "hit",
@@ -41,6 +44,9 @@ class Square {
   }
 }
 
+/**
+ * represents all ships in the game.
+ */
 const allShips = {
   carrier: new Ship("carrier", 5),
   battleship: new Ship("battleship", 4),
@@ -49,13 +55,11 @@ const allShips = {
   destroyer: new Ship("destroyer", 2),
 };
 
-function findShip(name) {
-  return allShips[name];
-}
+
 
 /*----- state variables -----*/
-let playerBoard = [];
-let computerBoard = [];
+let playerBoard = []; // the players game board represented as a 2D array of Square objects
+let computerBoard = []; // the players game board represented as a 2D array of Square objects
 
 let focusedShip; // the e.target of the ship being interacted with
 
@@ -99,10 +103,8 @@ function initGame() {
 }
 
 /**
- * Initializes the game board with square objects.
- *
- * @param {Array<Array<Square>>} board - The game board represented as a 2D array of Square objects.
- * @returns {Array<Array<Square>>} The initialized game board.
+ * creates a 10x10 2D array of Square objects.
+ * @param {array} board - The game board to initialize.
  */
 function initBoard(board) {
   for (let i = 0; i < 10; i++) {
@@ -151,28 +153,7 @@ function renderBoard(board) {
 
 }
 
-function handleKeyPress(e) {
-  console.log(e.key)
-
-  if (e.key === "r") {
-    rotateShip();
-  }
-}
-
-function handleClick(e) {
-  if (focusedShip && focusedShip === e.target) {
-    return;
-  }
-  if (focusedShip && focusedShip.style.border === "2px solid black") {
-    focusedShip.style.border = "none";
-  }
-  console.log(e.target);
-  focusedShip = e.target;
-  focusedShip.style.border = "2px solid black";
-  focusedShip.focus(); 
-}
-
-function rotateShip() { // TODO: allow rotation for all ships
+function rotateShip() { 
   if (focusedShip.classList.contains("horizontal")) {
     focusedShip.classList.remove("horizontal");
     focusedShip.classList.add("vertical");
@@ -182,29 +163,7 @@ function rotateShip() { // TODO: allow rotation for all ships
   }
 }
 
-/**
- * Returns the length of the ship based on its name.
- * @param {string} ship - The name of the ship.
- * @returns {number} - The length of the ship.
- */
-function lengthOfShip(ship) {
-  if (ship === "carrier") {
-    return 5;
-  }
-  if (ship === "battleship") {
-    return 4;
-  }
-  if (ship === "cruiser") {
-    return 3;
-  }
-  if (ship === "submarine") {
-    return 3;
-  }
-  if (ship === "destroyer") {
-    return 2;
-  }
-}
-
+// drag and drop functions
 function dragStart(e) {
   if (focusedShip) {
     focusedShip.style.border = "none";
@@ -280,6 +239,69 @@ function dragDrop(e) { // TODO: fix bug where ship can be placed outside of boar
 
 function dragOver(e) {
   e.preventDefault();
+}
+
+// listener functions
+/**
+ * handles when a key is pressed. (r rotates the ship)
+ * @param {KeyboardEvent} e - The keyboard event.
+ */
+function handleKeyPress(e) {
+  console.log(e.key)
+
+  if (e.key === "r") {
+    rotateShip();
+  }
+}
+
+/**
+ * handles when a ship is clicked on.
+ * @param {MouseEvent} e - The mouse event.
+ */
+function handleClick(e) {
+  if (focusedShip && focusedShip === e.target) {
+    return;
+  }
+  if (focusedShip && focusedShip.style.border === "2px solid black") {
+    focusedShip.style.border = "none";
+  }
+  console.log(e.target);
+  focusedShip = e.target;
+  focusedShip.style.border = "2px solid black";
+  focusedShip.focus(); 
+}
+
+// helper functions
+/**
+ * Returns the length of the ship based on its name.
+ * @param {string} ship - The name of the ship.
+ * @returns {number} - The length of the ship.
+ */
+function lengthOfShip(ship) {
+  if (ship === "carrier") {
+    return 5;
+  }
+  if (ship === "battleship") {
+    return 4;
+  }
+  if (ship === "cruiser") {
+    return 3;
+  }
+  if (ship === "submarine") {
+    return 3;
+  }
+  if (ship === "destroyer") {
+    return 2;
+  }
+}
+
+/**
+ * Finds a ship object by its name.
+ * @param {string} name - The name of the ship.
+ * @returns {Ship|undefined} - The ship object with the specified name, or undefined if not found.
+ */
+function findShip(name) {
+  return allShips[name];
 }
 
 initGame();
