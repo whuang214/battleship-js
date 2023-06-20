@@ -45,6 +45,7 @@ let playerBoard = [];
 let computerBoard = [];
 
 let draggedShip;
+let draggedShipLength;
 
 /*----- cached elements  -----*/
 const ships = document.querySelectorAll(".ship");
@@ -158,11 +159,36 @@ function rotateShip() { // TODO: allow rotation for all ships
   }
 }
 
+
+/**
+ * Returns the length of the ship based on its name.
+ * @param {string} ship - The name of the ship.
+ * @returns {number} - The length of the ship.
+ */
+function lengthOfShip(ship) {
+  if (ship === "carrier") {
+    return 5;
+  }
+  if (ship === "battleship") {
+    return 4;
+  }
+  if (ship === "cruiser") {
+    return 3;
+  }
+  if (ship === "submarine") {
+    return 3;
+  }
+  if (ship === "destroyer") {
+    return 2;
+  }
+}
+
 function dragStart(e) {
   if (draggedShip) {
     draggedShip.style.border = "none";
   }
   draggedShip = e.target;
+
 }
 
 function dragDrop(e) { // TODO: fix bug where ship can be placed outside of board
@@ -177,6 +203,11 @@ function dragDrop(e) { // TODO: fix bug where ship can be placed outside of boar
 
   // check if the ship can be placed in the square (check if the ship will fit)
   // change the state of the square to ship plus the surrounding squares
+
+  const shipOrientation = draggedShip.classList[2];
+  const shipLength = lengthOfShip(draggedShip.classList[1]);
+
+
 
 
   render();
