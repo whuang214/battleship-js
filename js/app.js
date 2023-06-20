@@ -216,8 +216,6 @@ function dragStart(e) {
 function dragDrop(e) { // TODO: fix bug where ship can be placed outside of board
   e.preventDefault();
 
-  console.log(e.target);
-
   const square = e.target; 
   const row = parseInt(square.id.split("-")[1]);
   const column = parseInt(square.id.split("-")[2]);
@@ -232,15 +230,15 @@ function dragDrop(e) { // TODO: fix bug where ship can be placed outside of boar
       }
       if (playerBoard[row][column + i].ship !== null) {
         if (playerBoard[row][column + i].ship.name !== focusedShip.classList[1]) {
-          console.log(column + i);
-          console.log(playerBoard[row][column + i].ship.name);
-          console.log(focusedShip.classList[1]);
           return;
         }
       }
-    } else if (shipOrientation === "vertical" || playerBoard[row][column + i].ship !== null) { // vertical
-      if (row + i > 9 || playerBoard[row + 1][column].ship !== null) {
-        if (playerBoard[row][column + i].ship.name !== focusedShip.classList[1]) {
+    } else if (shipOrientation === "vertical") { // vertical
+      if (row + i > 9) {
+        return;
+      }
+      if (playerBoard[row + 1][column].ship !== null) {
+        if (playerBoard[row + 1][column].ship.name !== focusedShip.classList[1]) {
           return;
         }
       }
@@ -266,14 +264,14 @@ function dragDrop(e) { // TODO: fix bug where ship can be placed outside of boar
       playerBoard[row][column + i].state = true;
     } else if (shipOrientation === "vertical") { // vertical
       playerBoard[row + i][column].ship = findShip(focusedShip.classList[1]);
-      playerBoard[row][column + i].state = true;
+      playerBoard[row + i][column].state = true;
     }
     else {
       console.log("What kind of edge case is this?");
     }
   }
 
-  e.target.appendChild(focusedShip);
+  // e.target.appendChild(focusedShip);
 
   render();
 
