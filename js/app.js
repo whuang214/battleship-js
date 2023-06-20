@@ -9,6 +9,7 @@ const state = {
   EMPTY: "empty",
   HIT: "hit",
   MISS: "miss",
+  SHIP: false,
 };
 
 /**
@@ -140,7 +141,7 @@ function renderBoard(board) {
           div.classList.add(state.HIT);
           console.log("hit");
         }
-        console.log(square.ship.name);
+        // console.log(square.ship.name);
       }
       else {
         div.classList.add(square.state);
@@ -215,6 +216,8 @@ function dragStart(e) {
 function dragDrop(e) { // TODO: fix bug where ship can be placed outside of board
   e.preventDefault();
 
+  console.log(e.target);
+
   const square = e.target; 
   const row = parseInt(square.id.split("-")[1]);
   const column = parseInt(square.id.split("-")[2]);
@@ -224,12 +227,22 @@ function dragDrop(e) { // TODO: fix bug where ship can be placed outside of boar
 
   for (let i = 0; i < shipLength; i++) {
     if (shipOrientation === "horizontal") {
-      if (column + i > 9 || playerBoard[row][column + i].ship !== null) {
+      if (column + i > 9) {
         return;
       }
-    } else if (shipOrientation === "vertical") { // vertical
-      if (row + i > 9 || playerBoard[row + i][column].ship !== null) {
-        return;
+      if (playerBoard[row][column + i].ship !== null) {
+        if (playerBoard[row][column + i].ship.name !== focusedShip.classList[1]) {
+          console.log(column + i);
+          console.log(playerBoard[row][column + i].ship.name);
+          console.log(focusedShip.classList[1]);
+          return;
+        }
+      }
+    } else if (shipOrientation === "vertical" || playerBoard[row][column + i].ship !== null) { // vertical
+      if (row + i > 9 || playerBoard[row + 1][column].ship !== null) {
+        if (playerBoard[row][column + i].ship.name !== focusedShip.classList[1]) {
+          return;
+        }
       }
     }
     else {
@@ -250,9 +263,10 @@ function dragDrop(e) { // TODO: fix bug where ship can be placed outside of boar
   for (let i = 0; i < shipLength; i++) {
     if (shipOrientation === "horizontal") {
       playerBoard[row][column + i].ship = findShip(focusedShip.classList[1]);
-
+      playerBoard[row][column + i].state = true;
     } else if (shipOrientation === "vertical") { // vertical
-      playerBoard[row + i][column].state = findShip(focusedShip.classList[1]);
+      playerBoard[row + i][column].ship = findShip(focusedShip.classList[1]);
+      playerBoard[row][column + i].state = true;
     }
     else {
       console.log("What kind of edge case is this?");
