@@ -198,8 +198,10 @@ function dragDrop(e) { // TODO: fix bug where ship can be placed outside of boar
   // update the surrounding squares with the ship state
   // update the square with the ship state
   const square = e.target;
-  const x = square.id.split("-")[1];
-  const y = square.id.split("-")[2];
+  const row = parseInt(square.id.split("-")[1]);
+  const column = parseInt(square.id.split("-")[2]);
+
+  console.log(row, column);
 
   // check if the ship can be placed in the square (check if the ship will fit)
   // change the state of the square to ship plus the surrounding squares
@@ -207,11 +209,24 @@ function dragDrop(e) { // TODO: fix bug where ship can be placed outside of boar
   const shipOrientation = draggedShip.classList[2];
   const shipLength = lengthOfShip(draggedShip.classList[1]);
 
+  for (let i = 0; i < shipLength; i++) {
+    if (shipOrientation === "horizontal") {
+      if (column + i > 9 || playerBoard[row][column + i].state === state.SHIP) {
+        return;
+      }
+    } else if (shipOrientation === "vertical") { // vertical
+      if (row + i > 9 || playerBoard[row + i][column].state === state.SHIP) {
+        return;
+      }
+    }
+    else {
+      console.log("What kind of edge case is this?");
+    }
+  }
 
-
+  e.target.appendChild(draggedShip);
 
   render();
-
 
 
 }
@@ -219,3 +234,15 @@ function dragDrop(e) { // TODO: fix bug where ship can be placed outside of boar
 function dragOver(e) {
   e.preventDefault();
 }
+
+function printPlayerboard() {
+  for (let i = 0; i < playerBoard.length; i++) {
+    let row = "";
+    for (let j = 0; j < playerBoard[i].length; j++) {
+      row += playerBoard[i][j].state + " ";
+    }
+    console.log(row);
+  }
+}
+
+initGame();
