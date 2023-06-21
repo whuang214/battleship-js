@@ -68,9 +68,14 @@ body {
   background-color: gray;
 }
 
-.game-container .board-container .computer-board div .hit,
-.game-container .board-container .player-board div .hit {
+.game-container .board-container .computer-board div.ship.hit,
+.game-container .board-container .player-board div.ship.hit {
   background-color: red;
+}
+
+.game-container .board-container .computer-board div.miss,
+.game-container .board-container .player-board div.miss {
+  background-color: lightgray;
 }
 
 

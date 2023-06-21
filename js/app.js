@@ -101,6 +101,7 @@ function initGame() {
   });
 
   playButton.addEventListener("click", startGame);
+  resetButton.addEventListener("click", resetShips);
 }
 
 /**
@@ -188,6 +189,81 @@ function playTurn(e) {
     console.log("You idiot, you broke the game");
   }
 
+  // win
+  if (checkWin(playerBoard)) {
+    alert("Computer Wins!");
+    return;
+  }
+  else if (checkWin(computerBoard)) {
+    alert("Player Wins!");
+    return;
+  }
+
+  render();
+}
+
+function randomizeComputerShips() {
+  for (let ship in allShips) {
+    let randomRow = Math.floor(Math.random() * 10);
+    let randomColumn = Math.floor(Math.random() * 10);
+    let randomOrientation = Math.floor(Math.random() * 2);
+
+    let shipOrientation = randomOrientation === 0 ? "horizontal" : "vertical";
+    let shipLength = lengthOfShip(ship);
+
+    while (
+      !canPlaceShip(
+        ship,
+        shipOrientation,
+        randomRow,
+        randomColumn,
+        computerBoard
+      )
+    ) {
+      randomRow = Math.floor(Math.random() * 10);
+      randomColumn = Math.floor(Math.random() * 10);
+      randomOrientation = Math.floor(Math.random() * 2);
+
+      shipOrientation = randomOrientation === 0 ? "horizontal" : "vertical";
+    }
+
+    for (let i = 0; i < shipLength; i++) {
+      if (shipOrientation === "horizontal") {
+        computerBoard[randomRow][randomColumn + i].ship = allShips[ship];
+        computerBoard[randomRow][randomColumn + i].state = state.SHIP;
+      } else {
+        computerBoard[randomRow + i][randomColumn].ship = allShips[ship];
+        computerBoard[randomRow + i][randomColumn].state = state.SHIP;
+      }
+    }
+  }
+}
+
+function checkWin(board) {
+  let count = 0;
+  for (let i = 0; i < board.length; i++) {
+    for (let j = 0; j < board[i].length; j++) {
+      if (board[i][j].state === state.HIT) {
+        count++;
+      }
+    }
+  }
+  // console.log(count);
+  return count === 17;
+}
+
+function resetShips() {
+  // iterate through the player board
+  // reset the state of each square to empty
+  // reset the ship of each square to null
+
+  for (let i = 0; i < playerBoard.length; i++) {
+    for (let j = 0; j < playerBoard[i].length; j++) {
+      playerBoard[i][j].state = state.EMPTY;
+      playerBoard[i][j].ship = null;
+    }
+  }
+
   render();
 }
 
@@ -233,42 +309,7 @@ function rotateShip() {
   }
 }
 
-function randomizeComputerShips() {
-  for (let ship in allShips) {
-    let randomRow = Math.floor(Math.random() * 10);
-    let randomColumn = Math.floor(Math.random() * 10);
-    let randomOrientation = Math.floor(Math.random() * 2);
 
-    let shipOrientation = randomOrientation === 0 ? "horizontal" : "vertical";
-    let shipLength = lengthOfShip(ship);
-
-    while (
-      !canPlaceShip(
-        ship,
-        shipOrientation,
-        randomRow,
-        randomColumn,
-        computerBoard
-      )
-    ) {
-      randomRow = Math.floor(Math.random() * 10);
-      randomColumn = Math.floor(Math.random() * 10);
-      randomOrientation = Math.floor(Math.random() * 2);
-
-      shipOrientation = randomOrientation === 0 ? "horizontal" : "vertical";
-    }
-
-    for (let i = 0; i < shipLength; i++) {
-      if (shipOrientation === "horizontal") {
-        computerBoard[randomRow][randomColumn + i].ship = allShips[ship];
-        computerBoard[randomRow][randomColumn + i].state = state.SHIP;
-      } else {
-        computerBoard[randomRow + i][randomColumn].ship = allShips[ship];
-        computerBoard[randomRow + i][randomColumn].state = state.SHIP;
-      }
-    }
-  }
-}
 
 // drag and drop functions
 function dragStart(e) {
@@ -370,10 +411,10 @@ function handleClick(e) {
   if (focusedShip && focusedShip === e.target) {
     return;
   }
-  if (focusedShip && focusedShip.style.border === "2px solid black") {
+  if (focusedShip && focusedShip.style.border !== "none") {
     focusedShip.style.border = "none";
   }
-  console.log(e.target);
+  // console.log(e.target);
   focusedShip = e.target;
   focusedShip.style.border = "2px solid black";
   focusedShip.focus();
@@ -454,5 +495,6 @@ function allShipsPlaced() {
   }
   return count === 17;
 }
+
 
 initGame();
