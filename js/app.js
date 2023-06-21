@@ -104,7 +104,9 @@ function initGame() {
   });
 
   playButton.addEventListener("click", startGame);
-  resetButton.addEventListener("click", resetShips);
+  resetButton.addEventListener("click", () => {
+    resetShips(playerBoard);
+  });
   randomizeShipsButton.addEventListener("click", () => {
     randomizeShips(playerBoard)});
 }
@@ -128,7 +130,8 @@ function initBoard(board) {
 function startGame() {
   if (allShipsPlaced()) {
     playButton.style.display = "none";
-    resetShipsButton.style.display = "none";
+    resetButton.style.display = "none";
+    randomizeShipsButton.style.display = "none";
   } else {
     alert("Please place all ships before starting the game.");
     return;
@@ -231,6 +234,7 @@ function randomizeShips(board) {
         board
       )
     ) {
+      
       randomRow = Math.floor(Math.random() * 10);
       randomColumn = Math.floor(Math.random() * 10);
       randomOrientation = Math.floor(Math.random() * 2);
@@ -248,6 +252,16 @@ function randomizeShips(board) {
       }
     }
   }
+
+  // band aid fix for when the randomizer doesn't work
+  if (numOfShips(board) !== 17) {
+    // randomizeShips(board);
+    console.log(`number of not 17: ${numOfShips(board)}`);
+  }
+
+
+
+
   render();
 }
 
@@ -264,15 +278,15 @@ function checkWin(board) {
   return count === 17;
 }
 
-function resetShips() {
+function resetShips(board) {
   // iterate through the player board
   // reset the state of each square to empty
   // reset the ship of each square to null
 
-  for (let i = 0; i < playerBoard.length; i++) {
-    for (let j = 0; j < playerBoard[i].length; j++) {
-      playerBoard[i][j].state = state.EMPTY;
-      playerBoard[i][j].ship = null;
+  for (let i = 0; i < board.length; i++) {
+    for (let j = 0; j < board[i].length; j++) {
+      board[i][j].state = state.EMPTY;
+      board[i][j].ship = null;
     }
   }
 
@@ -468,25 +482,22 @@ function findShip(name) {
 function canPlaceShip(ship, shipOrientation, row, column, board) {
   for (let i = 0; i < lengthOfShip(ship); i++) {
     if (shipOrientation === "horizontal") {
-      if (column + i > 8) {
+      if (column + i > 9) {
         return false;
       }
-      // console.log(column + i);
-      if (board[row][column + i].ship !== null) {
+      if (board[row][column + i].state !== state.EMPTY) {
         // if a ship is already there
         return false;
       }
     } else if (shipOrientation === "vertical") {
-      // vertical
-      if (row + i > 8) {
+      if (row + i > 9) {
         return false;
       }
-      // console.log(row + i);
-      if (board[row + 1][column].ship !== null) {
+      if (board[row + i][column].state !== state.EMPTY) {
         return false;
       }
     } else {
-      console.log("What kind of edge case is this?");
+      console.log("something went wrong in canPlaceShip");
       return false;
     }
   }
@@ -506,6 +517,19 @@ function allShipsPlaced() {
     }
   }
   return count === 17;
+}
+
+function numOfShips(board) {
+  // returns number of ships on the board
+  let count = 0;
+  for (let i = 0; i < board.length; i++) {
+    for (let j = 0; j < board[i].length; j++) {
+      if (board[i][j].ship !== null) {
+        count++;
+      }
+    }
+  }
+  return count;
 }
 
 
