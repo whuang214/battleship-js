@@ -115,6 +115,11 @@ body {
   color: #fff;
 }
 
+.button-container #randomBtn {
+  background-color: #2980b9;
+  color: #fff;
+}
+
 .button-container #replayBtn {
   background-color: #27ae60;
   color: #fff;

@@ -68,17 +68,20 @@ const computerSquares = document.querySelectorAll(".computer-board div");
 
 const playButton = document.getElementById("startBtn");
 const resetButton = document.getElementById("resetShipsButton");
+const randomizeShipsButton = document.getElementById("randomBtn");
 
 /*----- event listeners -----*/
 
 document.getElementById("playButton").addEventListener("click", () => {
   document.querySelector(".overlay").style.display = "none";
+  initGame();
 });
 
 /*----- functions -----*/
 
 // game functions
 function initGame() {
+  console.log("initGame called");
   // initialize the game boards
   initBoard(playerBoard);
   initBoard(computerBoard);
@@ -102,6 +105,8 @@ function initGame() {
 
   playButton.addEventListener("click", startGame);
   resetButton.addEventListener("click", resetShips);
+  randomizeShipsButton.addEventListener("click", () => {
+    randomizeShips(playerBoard)});
 }
 
 /**
@@ -129,7 +134,7 @@ function startGame() {
     return;
   }
 
-  randomizeComputerShips();
+  randomizeShips(computerBoard);
 
   console.log("game started");
 
@@ -202,7 +207,12 @@ function playTurn(e) {
   render();
 }
 
-function randomizeComputerShips() {
+function randomizeShips(board) {
+
+  // reset board:
+  resetShips(board);
+
+
   for (let ship in allShips) {
     let randomRow = Math.floor(Math.random() * 10);
     let randomColumn = Math.floor(Math.random() * 10);
@@ -210,6 +220,7 @@ function randomizeComputerShips() {
 
     let shipOrientation = randomOrientation === 0 ? "horizontal" : "vertical";
     let shipLength = lengthOfShip(ship);
+    // console.log(shipLength);
 
     while (
       !canPlaceShip(
@@ -217,7 +228,7 @@ function randomizeComputerShips() {
         shipOrientation,
         randomRow,
         randomColumn,
-        computerBoard
+        board
       )
     ) {
       randomRow = Math.floor(Math.random() * 10);
@@ -229,14 +240,15 @@ function randomizeComputerShips() {
 
     for (let i = 0; i < shipLength; i++) {
       if (shipOrientation === "horizontal") {
-        computerBoard[randomRow][randomColumn + i].ship = allShips[ship];
-        computerBoard[randomRow][randomColumn + i].state = state.SHIP;
+        board[randomRow][randomColumn + i].ship = allShips[ship];
+        board[randomRow][randomColumn + i].state = state.SHIP;
       } else {
-        computerBoard[randomRow + i][randomColumn].ship = allShips[ship];
-        computerBoard[randomRow + i][randomColumn].state = state.SHIP;
+        board[randomRow + i][randomColumn].ship = allShips[ship];
+        board[randomRow + i][randomColumn].state = state.SHIP;
       }
     }
   }
+  render();
 }
 
 function checkWin(board) {
@@ -497,4 +509,3 @@ function allShipsPlaced() {
 }
 
 
-initGame();
