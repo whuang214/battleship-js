@@ -86,9 +86,12 @@ squares.forEach((square) => {
 
 /*----- functions -----*/
 
+// game functions
 function initGame() {
   initBoard(playerBoard);
   initBoard(computerBoard);
+
+  randomizeComputerShips();
 
   render();
 
@@ -119,11 +122,11 @@ function initBoard(board) {
 }
 
 function render() {
-  renderBoard(playerBoard);
-  // renderBoard(computerBoard);
+  renderBoard(playerBoard, "player");
+  renderBoard(computerBoard, "computer");
 }
 
-function renderBoard(board) {
+function renderBoard(board, playerOrComputer) {
   // loop through the board
   // get the dom element
   // update the dom with the board state
@@ -133,7 +136,7 @@ function renderBoard(board) {
     for (let j = 0; j < board[i].length; j++) {
       const square = board[i][j];
       // get the dom element
-      const div = document.getElementById(`player-${i}-${j}`); 
+      const div = document.getElementById(`${playerOrComputer}-${i}-${j}`); 
       // update the dom with the board state
       div.classList.remove(...div.classList);
       if (square.ship !== null) {
@@ -161,6 +164,62 @@ function rotateShip() {
     focusedShip.classList.remove("vertical");
     focusedShip.classList.add("horizontal");
   }
+}
+
+function randomizeComputerShips() {
+  for (let ship in allShips) {
+    let randomRow = Math.floor(Math.random() * 10);
+    let randomColumn = Math.floor(Math.random() * 10);
+    let randomOrientation = Math.floor(Math.random() * 2);
+
+    let shipOrientation = randomOrientation === 0 ? "horizontal" : "vertical";
+    let shipLength = lengthOfShip(ship);
+
+
+    while (!canPlaceShip(ship, shipOrientation, randomRow, randomColumn, computerBoard)) {
+      randomRow = Math.floor(Math.random() * 10);
+      randomColumn = Math.floor(Math.random() * 10);
+      randomOrientation = Math.floor(Math.random() * 2);
+
+      shipOrientation = randomOrientation === 0 ? "horizontal" : "vertical";
+    }
+
+    for (let i = 0; i < shipLength; i++) {
+      if (shipOrientation === "horizontal") {
+        computerBoard[randomRow][randomColumn + i].ship = allShips[ship];
+      } else {
+        computerBoard[randomRow + i][randomColumn].ship = allShips[ship];
+      }
+    }
+  }
+
+}
+
+function canPlaceShip(ship, shipOrientation, row, column, board) {
+  for (let i = 0; i < lengthOfShip(ship); i++) {
+    if (shipOrientation === "horizontal") {
+      if (column + i > 8) {
+        return false;
+      }
+      console.log(column + i);
+      if (board[row][column + i].ship !== null) { // if a ship is already there
+        return false;
+      }
+    } else if (shipOrientation === "vertical") { // vertical
+      if (row + i > 8) {
+        return false;
+      }
+      console.log(row + i);
+      if (board[row + 1][column].ship !== null) {
+        return false;
+      }
+    }
+    else {
+      console.log("What kind of edge case is this?");
+      return false;
+    }
+  }
+  return true;
 }
 
 // drag and drop functions
