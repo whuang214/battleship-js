@@ -12,7 +12,7 @@ const state = {
   EMPTY: "empty",
   HIT: "hit",
   MISS: "miss",
-  SHIP: false,
+  SHIP: "ship",
 };
 
 /**
@@ -87,42 +87,20 @@ function initGame() {
   render();
 
   // adding and dropping ships
-  ships.forEach((ship) => { // for each ship listen for the following events
+  ships.forEach((ship) => {
+    // for each ship listen for the following events
     ship.addEventListener("dragstart", dragStart);
     ship.addEventListener("keydown", handleKeyPress);
     ship.addEventListener("click", handleClick);
   });
 
-  playerSquares.forEach((square) => { // for each square on the player board listen for the following events
+  playerSquares.forEach((square) => {
+    // for each square on the player board listen for the following events
     square.addEventListener("dragover", dragOver);
     square.addEventListener("drop", dragDrop);
   });
 
   playButton.addEventListener("click", startGame);
-
-}
-
-function startGame() {
-
-  if (allShipsPlaced()) {
-    playButton.style.display = "none";
-    resetShipsButton.style.display = "none";
-    return;
-  }
-
-  console.log("game started");
-
-
-  
-  // player turn
-  // computer turn
-  // check for winner
-  // end game
-
-
-  computerSquares.forEach((square) => {
-    // listen for clicks on the computer board
-  });
 }
 
 /**
@@ -139,6 +117,78 @@ function initBoard(board) {
     }
     board.push(row); // add the row to the board (push the row onto the board array)
   }
+}
+
+function startGame() {
+  if (allShipsPlaced()) {
+    playButton.style.display = "none";
+    resetShipsButton.style.display = "none";
+  } else {
+    alert("Please place all ships before starting the game.");
+    return;
+  }
+
+  randomizeComputerShips();
+
+  console.log("game started");
+
+  computerSquares.forEach((square) => {
+    // listen for clicks on the computer board
+    square.addEventListener("click", playTurn);
+  });
+
+  render();
+}
+
+function playTurn(e) {
+  e.preventDefault();
+
+  // player turn
+
+  const square = e.target;
+  const clickedRow = square.id.split("-")[1];
+  const clickedCol = square.id.split("-")[2];
+
+  // check if clicked square has already been clicked
+
+  console.log(`player clicked on row ${clickedRow} col ${clickedCol}`);
+
+  if (computerBoard[clickedRow][clickedCol].state === state.EMPTY) {
+    console.log("player miss");
+    computerBoard[clickedRow][clickedCol].state = state.MISS;
+  } else if (computerBoard[clickedRow][clickedCol].state === state.SHIP) {
+    console.log("player hit");
+    computerBoard[clickedRow][clickedCol].state = state.HIT;
+  } else {
+    console.log("player already clicked here");
+    return;
+  }
+
+  // computer turn
+
+  let randCol, randRow;
+
+  do {
+    randCol = Math.floor(Math.random() * 10);
+    randRow = Math.floor(Math.random() * 10);
+  } while (
+    playerBoard[randRow][randCol].state !== state.EMPTY && 
+    playerBoard[randRow][randCol].state !== state.SHIP
+    );
+
+  console.log(`computer clicked on row ${randRow} col ${randCol}`);
+
+  if (playerBoard[randRow][randCol].state === state.EMPTY) {
+    console.log("computer miss");
+    playerBoard[randRow][randCol].state = state.MISS;
+  } else if (playerBoard[randRow][randCol].state === state.SHIP) {
+    console.log("computer hit");
+    playerBoard[randRow][randCol].state = state.HIT;
+  } else {
+    console.log("You idiot, you broke the game");
+  }
+
+  render();
 }
 
 function render() {
@@ -164,7 +214,6 @@ function renderBoard(board, playerOrComputer) {
         div.classList.add(square.ship.name);
         if (square.state === state.HIT) {
           div.classList.add(state.HIT);
-          console.log("hit");
         }
         // console.log(square.ship.name);
       } else {
@@ -212,8 +261,10 @@ function randomizeComputerShips() {
     for (let i = 0; i < shipLength; i++) {
       if (shipOrientation === "horizontal") {
         computerBoard[randomRow][randomColumn + i].ship = allShips[ship];
+        computerBoard[randomRow][randomColumn + i].state = state.SHIP;
       } else {
         computerBoard[randomRow + i][randomColumn].ship = allShips[ship];
+        computerBoard[randomRow + i][randomColumn].state = state.SHIP;
       }
     }
   }
@@ -228,7 +279,6 @@ function dragStart(e) {
 }
 
 function dragDrop(e) {
-  // TODO: fix bug where ship can be placed outside of board
   e.preventDefault();
 
   const square = e.target;
@@ -280,11 +330,11 @@ function dragDrop(e) {
   for (let i = 0; i < shipLength; i++) {
     if (shipOrientation === "horizontal") {
       playerBoard[row][column + i].ship = findShip(focusedShip.classList[1]);
-      playerBoard[row][column + i].state = true;
+      playerBoard[row][column + i].state =  state.SHIP;
     } else if (shipOrientation === "vertical") {
       // vertical
       playerBoard[row + i][column].ship = findShip(focusedShip.classList[1]);
-      playerBoard[row + i][column].state = true;
+      playerBoard[row + i][column].state = state.SHIP;
     } else {
       console.log("What kind of edge case is this?");
     }
@@ -368,7 +418,7 @@ function canPlaceShip(ship, shipOrientation, row, column, board) {
       if (column + i > 8) {
         return false;
       }
-      console.log(column + i);
+      // console.log(column + i);
       if (board[row][column + i].ship !== null) {
         // if a ship is already there
         return false;
@@ -378,7 +428,7 @@ function canPlaceShip(ship, shipOrientation, row, column, board) {
       if (row + i > 8) {
         return false;
       }
-      console.log(row + i);
+      // console.log(row + i);
       if (board[row + 1][column].ship !== null) {
         return false;
       }
