@@ -55,8 +55,6 @@ const allShips = {
   destroyer: new Ship("destroyer", 2),
 };
 
-
-
 /*----- state variables -----*/
 let playerBoard = []; // the players game board represented as a 2D array of Square objects
 let computerBoard = []; // the players game board represented as a 2D array of Square objects
@@ -65,7 +63,11 @@ let focusedShip; // the e.target of the ship being interacted with
 
 /*----- cached elements  -----*/
 const ships = document.querySelectorAll(".ship");
-const squares = document.querySelectorAll(".player-board div");
+const playerSquares = document.querySelectorAll(".player-board div");
+const computerSquares = document.querySelectorAll(".computer-board div");
+
+const playButton = document.getElementById("startBtn");
+const resetButton = document.getElementById("resetShipsButton");
 
 /*----- event listeners -----*/
 
@@ -73,36 +75,54 @@ document.getElementById("playButton").addEventListener("click", () => {
   document.querySelector(".overlay").style.display = "none";
 });
 
-ships.forEach((ship) => {
-  ship.addEventListener("dragstart", dragStart);
-  ship.addEventListener("keydown", handleKeyPress);
-  ship.addEventListener("click", handleClick);
-});
-
-squares.forEach((square) => {
-  square.addEventListener("dragover", dragOver);
-  square.addEventListener("drop", dragDrop);
-});
-
 /*----- functions -----*/
 
 // game functions
 function initGame() {
+  // initialize the game boards
   initBoard(playerBoard);
   initBoard(computerBoard);
 
-  randomizeComputerShips();
-
+  // render the game boards
   render();
 
-  // place ships on board
-  // player places ships
-  // computer places ships
-  // start game
+  // adding and dropping ships
+  ships.forEach((ship) => { // for each ship listen for the following events
+    ship.addEventListener("dragstart", dragStart);
+    ship.addEventListener("keydown", handleKeyPress);
+    ship.addEventListener("click", handleClick);
+  });
+
+  playerSquares.forEach((square) => { // for each square on the player board listen for the following events
+    square.addEventListener("dragover", dragOver);
+    square.addEventListener("drop", dragDrop);
+  });
+
+  playButton.addEventListener("click", startGame);
+
+}
+
+function startGame() {
+
+  if (allShipsPlaced()) {
+    playButton.style.display = "none";
+    resetShipsButton.style.display = "none";
+    return;
+  }
+
+  console.log("game started");
+
+
+  
   // player turn
   // computer turn
   // check for winner
   // end game
+
+
+  computerSquares.forEach((square) => {
+    // listen for clicks on the computer board
+  });
 }
 
 /**
@@ -136,7 +156,7 @@ function renderBoard(board, playerOrComputer) {
     for (let j = 0; j < board[i].length; j++) {
       const square = board[i][j];
       // get the dom element
-      const div = document.getElementById(`${playerOrComputer}-${i}-${j}`); 
+      const div = document.getElementById(`${playerOrComputer}-${i}-${j}`);
       // update the dom with the board state
       div.classList.remove(...div.classList);
       if (square.ship !== null) {
@@ -147,16 +167,14 @@ function renderBoard(board, playerOrComputer) {
           console.log("hit");
         }
         // console.log(square.ship.name);
-      }
-      else {
+      } else {
         div.classList.add(square.state);
       }
     }
   }
-
 }
 
-function rotateShip() { 
+function rotateShip() {
   if (focusedShip.classList.contains("horizontal")) {
     focusedShip.classList.remove("horizontal");
     focusedShip.classList.add("vertical");
@@ -175,8 +193,15 @@ function randomizeComputerShips() {
     let shipOrientation = randomOrientation === 0 ? "horizontal" : "vertical";
     let shipLength = lengthOfShip(ship);
 
-
-    while (!canPlaceShip(ship, shipOrientation, randomRow, randomColumn, computerBoard)) {
+    while (
+      !canPlaceShip(
+        ship,
+        shipOrientation,
+        randomRow,
+        randomColumn,
+        computerBoard
+      )
+    ) {
       randomRow = Math.floor(Math.random() * 10);
       randomColumn = Math.floor(Math.random() * 10);
       randomOrientation = Math.floor(Math.random() * 2);
@@ -192,34 +217,6 @@ function randomizeComputerShips() {
       }
     }
   }
-
-}
-
-function canPlaceShip(ship, shipOrientation, row, column, board) {
-  for (let i = 0; i < lengthOfShip(ship); i++) {
-    if (shipOrientation === "horizontal") {
-      if (column + i > 8) {
-        return false;
-      }
-      console.log(column + i);
-      if (board[row][column + i].ship !== null) { // if a ship is already there
-        return false;
-      }
-    } else if (shipOrientation === "vertical") { // vertical
-      if (row + i > 8) {
-        return false;
-      }
-      console.log(row + i);
-      if (board[row + 1][column].ship !== null) {
-        return false;
-      }
-    }
-    else {
-      console.log("What kind of edge case is this?");
-      return false;
-    }
-  }
-  return true;
 }
 
 // drag and drop functions
@@ -228,13 +225,13 @@ function dragStart(e) {
     focusedShip.style.border = "none";
   }
   focusedShip = e.target;
-
 }
 
-function dragDrop(e) { // TODO: fix bug where ship can be placed outside of board
+function dragDrop(e) {
+  // TODO: fix bug where ship can be placed outside of board
   e.preventDefault();
 
-  const square = e.target; 
+  const square = e.target;
   const row = parseInt(square.id.split("-")[1]);
   const column = parseInt(square.id.split("-")[2]);
 
@@ -247,21 +244,25 @@ function dragDrop(e) { // TODO: fix bug where ship can be placed outside of boar
         return;
       }
       if (playerBoard[row][column + i].ship !== null) {
-        if (playerBoard[row][column + i].ship.name !== focusedShip.classList[1]) {
+        if (
+          playerBoard[row][column + i].ship.name !== focusedShip.classList[1]
+        ) {
           return;
         }
       }
-    } else if (shipOrientation === "vertical") { // vertical
+    } else if (shipOrientation === "vertical") {
+      // vertical
       if (row + i > 9) {
         return;
       }
       if (playerBoard[row + 1][column].ship !== null) {
-        if (playerBoard[row + 1][column].ship.name !== focusedShip.classList[1]) {
+        if (
+          playerBoard[row + 1][column].ship.name !== focusedShip.classList[1]
+        ) {
           return;
         }
       }
-    }
-    else {
+    } else {
       console.log("What kind of edge case is this?");
     }
   }
@@ -280,11 +281,11 @@ function dragDrop(e) { // TODO: fix bug where ship can be placed outside of boar
     if (shipOrientation === "horizontal") {
       playerBoard[row][column + i].ship = findShip(focusedShip.classList[1]);
       playerBoard[row][column + i].state = true;
-    } else if (shipOrientation === "vertical") { // vertical
+    } else if (shipOrientation === "vertical") {
+      // vertical
       playerBoard[row + i][column].ship = findShip(focusedShip.classList[1]);
       playerBoard[row + i][column].state = true;
-    }
-    else {
+    } else {
       console.log("What kind of edge case is this?");
     }
   }
@@ -292,8 +293,6 @@ function dragDrop(e) { // TODO: fix bug where ship can be placed outside of boar
   // e.target.appendChild(focusedShip);
 
   render();
-
-
 }
 
 function dragOver(e) {
@@ -306,7 +305,7 @@ function dragOver(e) {
  * @param {KeyboardEvent} e - The keyboard event.
  */
 function handleKeyPress(e) {
-  console.log(e.key)
+  console.log(e.key);
 
   if (e.key === "r") {
     rotateShip();
@@ -327,7 +326,7 @@ function handleClick(e) {
   console.log(e.target);
   focusedShip = e.target;
   focusedShip.style.border = "2px solid black";
-  focusedShip.focus(); 
+  focusedShip.focus();
 }
 
 // helper functions
@@ -361,6 +360,49 @@ function lengthOfShip(ship) {
  */
 function findShip(name) {
   return allShips[name];
+}
+
+function canPlaceShip(ship, shipOrientation, row, column, board) {
+  for (let i = 0; i < lengthOfShip(ship); i++) {
+    if (shipOrientation === "horizontal") {
+      if (column + i > 8) {
+        return false;
+      }
+      console.log(column + i);
+      if (board[row][column + i].ship !== null) {
+        // if a ship is already there
+        return false;
+      }
+    } else if (shipOrientation === "vertical") {
+      // vertical
+      if (row + i > 8) {
+        return false;
+      }
+      console.log(row + i);
+      if (board[row + 1][column].ship !== null) {
+        return false;
+      }
+    } else {
+      console.log("What kind of edge case is this?");
+      return false;
+    }
+  }
+  return true;
+}
+
+function allShipsPlaced() {
+  // iterate through entire playerboard
+  // count number of squares that have a ship equal to 5 + 4 + 3 + 3 + 2
+  // if not, return false
+  let count = 0;
+  for (let i = 0; i < playerBoard.length; i++) {
+    for (let j = 0; j < playerBoard[i].length; j++) {
+      if (playerBoard[i][j].ship !== null) {
+        count++;
+      }
+    }
+  }
+  return count === 17;
 }
 
 initGame();

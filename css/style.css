@@ -14,7 +14,6 @@ body {
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
-  display: none;
   flex-direction: column; /* align items vertically, in this case */
   justify-content: center; /* center items vertically, in this case */
   align-items: center; /* center items horizontally, in this case */
@@ -92,6 +91,22 @@ body {
   padding: 10px 20px;
   font-size: 18px;
   cursor: pointer;
+}
+
+.button-container #resetShipsButton {
+  background-color: #e74c3c;
+  color: #fff;
+}
+
+.button-container #startBtn {
+  background-color: #27ae60;
+  color: #fff;
+}
+
+.button-container #replayBtn {
+  background-color: #27ae60;
+  color: #fff;
+  display: none;
 }
 
 .ships-container {
