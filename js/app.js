@@ -31,7 +31,6 @@ class Ship {
   }
 }
 
-
 /**
  * represents all ships in the game.
  */
@@ -55,7 +54,6 @@ class Square {
   }
 }
 
-
 /*----- state variables -----*/
 let playerBoard = []; // the players game board represented as a 2D array of Square objects
 let computerBoard = []; // the players game board represented as a 2D array of Square objects
@@ -72,11 +70,14 @@ const computerSquares = document.querySelectorAll(".computer-board div");
 const playButton = document.getElementById("startBtn");
 const resetButton = document.getElementById("resetShipsButton");
 const randomizeShipsButton = document.getElementById("randomBtn");
+const replayButton = document.getElementById("replayBtn");
 
 const shipContainer = document.querySelector(".ships-container");
 
 const mainMessage = document.querySelector(".info-container #main-message");
-const secondaryMessage = document.querySelector(".info-container #secondary-message");
+const secondaryMessage = document.querySelector(
+  ".info-container #secondary-message"
+);
 
 /*----- event listeners -----*/
 
@@ -140,19 +141,21 @@ function initGame() {
   console.log("initGame called");
 
   // display inital message to users
-  mainMessage.textContent = "Place your ships. Click on the ship and press 'r' to rotate";
-  
+  mainMessage.style.color = "white";
+  mainMessage.textContent =
+    "Place your ships. Click on the ship and press 'r' to rotate";
+
   // initialize the game boards
   initBoard(playerBoard);
   initBoard(computerBoard);
 
-  // cheatsOn(); // show the computer ships
+  cheats = false; // hide the computer ships
 
   // render the game boards
   render();
 
   // event listeners
-  ships.forEach((ship) => { 
+  ships.forEach((ship) => {
     // for each ship listen for the following events
     ship.addEventListener("dragstart", dragStart);
     ship.addEventListener("keydown", handleKeyPress);
@@ -166,12 +169,19 @@ function initGame() {
   });
 
   // event listeners for buttons
+  playButton.style.display = "inline-block";
   playButton.addEventListener("click", startGame);
+  resetButton.style.display = "inline-block";
   resetButton.addEventListener("click", () => {
     resetShips(playerBoard);
   });
   randomizeShipsButton.addEventListener("click", () => {
-    randomizeShips(playerBoard)});
+    randomizeShips(playerBoard);
+  });
+  randomizeShipsButton.style.display = "inline-block";
+  replayButton.style.display = "none";
+  replayButton.addEventListener("click", resetGame);
+  shipContainer.style.display = "flex";
 }
 
 /**
@@ -179,6 +189,10 @@ function initGame() {
  * @param {array} board - The game board to initialize.
  */
 function initBoard(board) {
+  // if board already exists, clear it
+  if (board.length > 0) {
+    board = [];
+  }
   for (let i = 0; i < 10; i++) {
     // create 10 rows
     const row = []; // create a new row
@@ -212,7 +226,10 @@ function startGame(e) {
 
   console.log("game started");
 
-  mainMessage.textContent = "Game started. Click on the computer board to fire.";
+  mainMessage.textContent =
+    "Game started. Click on the computer board to fire.";
+  secondaryMessage.textContent = "";
+  secondaryMessage.style.display = "inline";
 
   computerSquares.forEach((square) => {
     // listen for clicks on the computer board
@@ -229,7 +246,6 @@ function startGame(e) {
  * @returns {void}
  */
 function playTurn(e) {
-
   e.preventDefault();
 
   if (winner !== 0) {
@@ -242,25 +258,24 @@ function playTurn(e) {
   const clickedRow = square.id.split("-")[1];
   const clickedCol = square.id.split("-")[2];
 
-  console.log(`player clicked on row ${clickedRow} col ${clickedCol}`);
+  // console.log(`player clicked on row ${clickedRow} col ${clickedCol}`);
 
   if (computerBoard[clickedRow][clickedCol].state === state.EMPTY) {
-    console.log("player miss");
+    // console.log("player miss");
     mainMessage.textContent = "You missed.";
     mainMessage.style.color = "yellow";
     computerBoard[clickedRow][clickedCol].state = state.MISS;
   } else if (computerBoard[clickedRow][clickedCol].state === state.SHIP) {
-    console.log("player hit");
+    // console.log("player hit");
     mainMessage.textContent = "You hit a ship!";
     mainMessage.style.color = "red";
     computerBoard[clickedRow][clickedCol].state = state.HIT;
   } else {
-    console.log("player already clicked here");
+    // console.log("player already clicked here");
     return;
   }
 
   // TODO add delay (computer is thinking)
-
 
   // computer turn
 
@@ -270,19 +285,20 @@ function playTurn(e) {
     randCol = Math.floor(Math.random() * 10);
     randRow = Math.floor(Math.random() * 10);
   } while (
-    playerBoard[randRow][randCol].state !== state.EMPTY && 
+    playerBoard[randRow][randCol].state !== state.EMPTY &&
     playerBoard[randRow][randCol].state !== state.SHIP
-    );
+  );
 
-  console.log(`computer clicked on row ${randRow} col ${randCol}`);
+  // console.log(`computer clicked on row ${randRow} col ${randCol}`);
 
   if (playerBoard[randRow][randCol].state === state.EMPTY) {
-    console.log("computer miss");
+    // console.log("computer miss");
     secondaryMessage.textContent = "Computer missed.";
     secondaryMessage.style.color = "yellow";
     playerBoard[randRow][randCol].state = state.MISS;
+    
   } else if (playerBoard[randRow][randCol].state === state.SHIP) {
-    console.log("computer hit");
+    // console.log("computer hit");
     secondaryMessage.textContent = "Computer hit a ship!";
     secondaryMessage.style.color = "red";
     playerBoard[randRow][randCol].state = state.HIT;
@@ -295,37 +311,41 @@ function playTurn(e) {
   // win
   if (checkWin(playerBoard)) {
     winner = -1;
+    gameOver();
     return;
-  }
-  else if (checkWin(computerBoard)) {
+  } else if (checkWin(computerBoard)) {
     winner = 1;
+    gameOver();
     return;
   }
+}
 
-  gameOver();
+function resetGame() {
+  resetShips(playerBoard);
+  resetShips(computerBoard);
+  winner = 0;
 
+  initGame();
 }
 
 function gameOver() {
+  console.log("game over");
   // TODO add game over screen
   // TODO unhide play again button
   if (winner === 1) {
-    mainMessage.textContent = "You win!";
+    mainMessage.textContent = "You Win!";
     mainMessage.style.color = "green";
-    secondaryMessage.textContent = "Game over.";
-  }
-  else if (winner === -1) {
-    mainMessage.textContent = "You lose!";
+    secondaryMessage.style.display = "none";
+  } else if (winner === -1) {
+    mainMessage.textContent = "Computer Wins!";
     mainMessage.style.color = "red";
-    secondaryMessage.textContent = "Game over.";
+    secondaryMessage.style.display = "none";
   }
-  else {
-    return;
-  }
+
+  replayButton.style.display = "block";
 }
 
 function randomizeShips(board) {
-
   // reset all ships board
   resetShips(board);
 
@@ -338,15 +358,8 @@ function randomizeShips(board) {
     let shipLength = lengthOfShip(ship);
 
     while (
-      !canPlaceShip(
-        ship,
-        shipOrientation,
-        randomRow,
-        randomColumn,
-        board
-      )
+      !canPlaceShip(ship, shipOrientation, randomRow, randomColumn, board)
     ) {
-      
       randomRow = Math.floor(Math.random() * 10);
       randomColumn = Math.floor(Math.random() * 10);
       randomOrientation = Math.floor(Math.random() * 2);
@@ -370,7 +383,6 @@ function randomizeShips(board) {
     // randomizeShips(board);
     console.log(`number of not 17: ${numOfShips(board)}`);
   }
-
 
   render();
 }
@@ -417,8 +429,6 @@ function resetShips(board) {
   render();
 }
 
-
-
 function rotateShip() {
   if (focusedShip.classList.contains("horizontal")) {
     focusedShip.classList.remove("horizontal");
@@ -428,8 +438,6 @@ function rotateShip() {
     focusedShip.classList.add("horizontal");
   }
 }
-
-
 
 // drag and drop functions
 function dragStart(e) {
@@ -491,7 +499,7 @@ function dragDrop(e) {
   for (let i = 0; i < shipLength; i++) {
     if (shipOrientation === "horizontal") {
       playerBoard[row][column + i].ship = findShip(focusedShip.classList[1]);
-      playerBoard[row][column + i].state =  state.SHIP;
+      playerBoard[row][column + i].state = state.SHIP;
     } else if (shipOrientation === "vertical") {
       // vertical
       playerBoard[row + i][column].ship = findShip(focusedShip.classList[1]);
@@ -630,5 +638,3 @@ function cheatsOn() {
   cheats = true;
   render();
 }
-
-
