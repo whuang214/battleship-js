@@ -3,7 +3,6 @@ console.log("app.js loaded");
 /*----- constants -----*/
 
 let winner = 0; // 0 = no winner, 1 = player, -1 = computer
-let turn = 1; // 1 = player, -1 = computer
 
 /**
  * Represents the state of a square on the game board.
@@ -32,17 +31,6 @@ class Ship {
   }
 }
 
-/**
- * Represents a square on the game board.
- */
-class Square {
-  constructor(x, y) {
-    this.x = x;
-    this.y = y;
-    this.state = state.EMPTY;
-    this.ship = null;
-  }
-}
 
 /**
  * represents all ships in the game.
@@ -55,6 +43,19 @@ const allShips = {
   destroyer: new Ship("destroyer", 2),
 };
 
+/**
+ * Represents a square on the game board.
+ */
+class Square {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.state = state.EMPTY;
+    this.ship = null;
+  }
+}
+
+
 /*----- state variables -----*/
 let playerBoard = []; // the players game board represented as a 2D array of Square objects
 let computerBoard = []; // the players game board represented as a 2D array of Square objects
@@ -63,7 +64,7 @@ let focusedShip; // the e.target of the ship being interacted with
 
 let cheats = false; // if true, show the computer ships
 
-/*----- cached elements  -----*/
+/*----- cached dom elements  -----*/
 const ships = document.querySelectorAll(".ship");
 const playerSquares = document.querySelectorAll(".player-board div");
 const computerSquares = document.querySelectorAll(".computer-board div");
@@ -86,21 +87,72 @@ document.getElementById("playButton").addEventListener("click", () => {
 
 /*----- functions -----*/
 
-// game functions
+/**
+ * Renders the game boards by calling the renderBoard function for the player and computer boards.
+ * @returns {void}
+ */
+function render() {
+  renderBoard(playerBoard, "player");
+  renderBoard(computerBoard, "computer");
+}
+
+/**
+ * Renders the game board by updating the DOM elements with the corresponding board state.
+ * @param {Array<Array<Object>>} board - The game board to be rendered.
+ * @param {string} playerOrComputer - Indicates whether the board belongs to the player or computer.
+ * @returns {void}
+ */
+function renderBoard(board, playerOrComputer) {
+  // loop through the board
+  // get the dom element
+  // update the dom with the board state
+
+  for (let i = 0; i < board.length; i++) {
+    // loop through the board
+    for (let j = 0; j < board[i].length; j++) {
+      const square = board[i][j];
+      // get the dom element
+      const div = document.getElementById(`${playerOrComputer}-${i}-${j}`);
+      // update the dom with the board state
+      div.classList.remove(...div.classList);
+      if (square.ship !== null) {
+        div.classList.add("ship");
+        div.classList.add(square.ship.name);
+        if (!cheats && playerOrComputer === "computer") {
+          div.classList.add("hidden");
+        }
+        if (square.state === state.HIT) {
+          div.classList.add(state.HIT);
+        }
+        // console.log(square.ship.name);
+      } else {
+        div.classList.add(square.state);
+      }
+    }
+  }
+}
+
+/**
+ * Initializes the game by setting up the game boards, rendering them, and adding event listeners.
+ */
 function initGame() {
+  // Log a message indicating that the function has been called
   console.log("initGame called");
+
+  // display inital message to users
   mainMessage.textContent = "Place your ships. Click on the ship and press 'r' to rotate";
+  
   // initialize the game boards
   initBoard(playerBoard);
   initBoard(computerBoard);
 
-  // cheatsOn();
+  // cheatsOn(); // show the computer ships
 
   // render the game boards
   render();
 
-  // adding and dropping ships
-  ships.forEach((ship) => {
+  // event listeners
+  ships.forEach((ship) => { 
     // for each ship listen for the following events
     ship.addEventListener("dragstart", dragStart);
     ship.addEventListener("keydown", handleKeyPress);
@@ -113,6 +165,7 @@ function initGame() {
     square.addEventListener("drop", dragDrop);
   });
 
+  // event listeners for buttons
   playButton.addEventListener("click", startGame);
   resetButton.addEventListener("click", () => {
     resetShips(playerBoard);
@@ -137,6 +190,11 @@ function initBoard(board) {
   }
 }
 
+/**
+ * Starts the game by checking if all ships are placed and setting up the game board for gameplay.
+ * @param {Event} e - The event object (e.g., click event) that triggered the function.
+ * @returns {void}
+ */
 function startGame(e) {
   e.preventDefault();
   if (allShipsPlaced()) {
@@ -161,9 +219,15 @@ function startGame(e) {
     square.addEventListener("click", playTurn);
   });
 
+  // render the updated game board
   render();
 }
 
+/**
+ * Plays a turn in the game by handling the player's and computer's moves.
+ * @param {Event} e - The event object (e.g., click event) that triggered the function.
+ * @returns {void}
+ */
 function playTurn(e) {
   e.preventDefault();
 
@@ -173,21 +237,20 @@ function playTurn(e) {
   const clickedRow = square.id.split("-")[1];
   const clickedCol = square.id.split("-")[2];
 
-  // check if clicked square has already been clicked
-
   console.log(`player clicked on row ${clickedRow} col ${clickedCol}`);
 
   if (computerBoard[clickedRow][clickedCol].state === state.EMPTY) {
     console.log("player miss");
     mainMessage.textContent = "You missed.";
+    mainMessage.style.color = "yellow";
     computerBoard[clickedRow][clickedCol].state = state.MISS;
   } else if (computerBoard[clickedRow][clickedCol].state === state.SHIP) {
     console.log("player hit");
     mainMessage.textContent = "You hit a ship!";
+    mainMessage.style.color = "red";
     computerBoard[clickedRow][clickedCol].state = state.HIT;
   } else {
     console.log("player already clicked here");
-    mainMessage.textContent = "You already clicked here.";
     return;
   }
 
@@ -211,33 +274,37 @@ function playTurn(e) {
   if (playerBoard[randRow][randCol].state === state.EMPTY) {
     console.log("computer miss");
     secondaryMessage.textContent = "Computer missed.";
+    secondaryMessage.style.color = "yellow";
     playerBoard[randRow][randCol].state = state.MISS;
   } else if (playerBoard[randRow][randCol].state === state.SHIP) {
     console.log("computer hit");
     secondaryMessage.textContent = "Computer hit a ship!";
+    secondaryMessage.style.color = "red";
     playerBoard[randRow][randCol].state = state.HIT;
   } else {
     console.log("You idiot, you broke the game");
   }
 
+  render();
+
   // win
   if (checkWin(playerBoard)) {
     alert("Computer Wins!");
+    winner = -1;
     return;
   }
   else if (checkWin(computerBoard)) {
     alert("Player Wins!");
+    winner = 1;
     return;
   }
 
-  render();
 }
 
 function randomizeShips(board) {
 
-  // reset board:
+  // reset all ships board
   resetShips(board);
-
 
   for (let ship in allShips) {
     let randomRow = Math.floor(Math.random() * 10);
@@ -246,7 +313,6 @@ function randomizeShips(board) {
 
     let shipOrientation = randomOrientation === 0 ? "horizontal" : "vertical";
     let shipLength = lengthOfShip(ship);
-    // console.log(shipLength);
 
     while (
       !canPlaceShip(
@@ -281,8 +347,6 @@ function randomizeShips(board) {
     // randomizeShips(board);
     console.log(`number of not 17: ${numOfShips(board)}`);
   }
-
-
 
 
   render();
@@ -331,40 +395,6 @@ function resetShips(board) {
 }
 
 
-function render() {
-  renderBoard(playerBoard, "player");
-  renderBoard(computerBoard, "computer");
-}
-
-function renderBoard(board, playerOrComputer) {
-  // loop through the board
-  // get the dom element
-  // update the dom with the board state
-
-  for (let i = 0; i < board.length; i++) {
-    // loop through the board
-    for (let j = 0; j < board[i].length; j++) {
-      const square = board[i][j];
-      // get the dom element
-      const div = document.getElementById(`${playerOrComputer}-${i}-${j}`);
-      // update the dom with the board state
-      div.classList.remove(...div.classList);
-      if (square.ship !== null) {
-        div.classList.add("ship");
-        div.classList.add(square.ship.name);
-        if (!cheats && playerOrComputer === "computer") {
-          div.classList.add("hidden");
-        }
-        if (square.state === state.HIT) {
-          div.classList.add(state.HIT);
-        }
-        // console.log(square.ship.name);
-      } else {
-        div.classList.add(square.state);
-      }
-    }
-  }
-}
 
 function rotateShip() {
   if (focusedShip.classList.contains("horizontal")) {
