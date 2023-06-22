@@ -72,6 +72,8 @@ const randomizeShipsButton = document.getElementById("randomBtn");
 
 const shipContainer = document.querySelector(".ships-container");
 
+const message = document.querySelector(".info-container h1");
+
 /*----- event listeners -----*/
 
 document.getElementById("playButton").addEventListener("click", () => {
@@ -84,6 +86,7 @@ document.getElementById("playButton").addEventListener("click", () => {
 // game functions
 function initGame() {
   console.log("initGame called");
+  message.textContent = "Place your ships. Click on the ship and press 'r' to rotate";
   // initialize the game boards
   initBoard(playerBoard);
   initBoard(computerBoard);
