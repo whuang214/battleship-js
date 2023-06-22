@@ -23,6 +23,7 @@ Play the game by visting [this](https://whuang214.github.io/battleship-js/) link
 
 **Here are some planned features for the game:**
 
+- Add better styles for the ships
 - Implement AI for the computer versus random shooting
 - Add a scoreboard (e.g best out of 3 against the computer)
 - Add sound effects
