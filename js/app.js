@@ -70,6 +70,8 @@ const playButton = document.getElementById("startBtn");
 const resetButton = document.getElementById("resetShipsButton");
 const randomizeShipsButton = document.getElementById("randomBtn");
 
+const shipContainer = document.querySelector(".ships-container");
+
 /*----- event listeners -----*/
 
 document.getElementById("playButton").addEventListener("click", () => {
@@ -132,6 +134,7 @@ function startGame() {
     playButton.style.display = "none";
     resetButton.style.display = "none";
     randomizeShipsButton.style.display = "none";
+    shipContainer.style.display = "none";
   } else {
     alert("Please place all ships before starting the game.");
     return;
