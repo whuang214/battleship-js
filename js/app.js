@@ -61,6 +61,8 @@ let computerBoard = []; // the players game board represented as a 2D array of S
 
 let focusedShip; // the e.target of the ship being interacted with
 
+let cheats = false; // if true, show the computer ships
+
 /*----- cached elements  -----*/
 const ships = document.querySelectorAll(".ship");
 const playerSquares = document.querySelectorAll(".player-board div");
@@ -72,7 +74,8 @@ const randomizeShipsButton = document.getElementById("randomBtn");
 
 const shipContainer = document.querySelector(".ships-container");
 
-const message = document.querySelector(".info-container h1");
+const mainMessage = document.querySelector(".info-container #main-message");
+const secondaryMessage = document.querySelector(".info-container #secondary-message");
 
 /*----- event listeners -----*/
 
@@ -86,10 +89,12 @@ document.getElementById("playButton").addEventListener("click", () => {
 // game functions
 function initGame() {
   console.log("initGame called");
-  message.textContent = "Place your ships. Click on the ship and press 'r' to rotate";
+  mainMessage.textContent = "Place your ships. Click on the ship and press 'r' to rotate";
   // initialize the game boards
   initBoard(playerBoard);
   initBoard(computerBoard);
+
+  // cheatsOn();
 
   // render the game boards
   render();
@@ -132,7 +137,8 @@ function initBoard(board) {
   }
 }
 
-function startGame() {
+function startGame(e) {
+  e.preventDefault();
   if (allShipsPlaced()) {
     playButton.style.display = "none";
     resetButton.style.display = "none";
@@ -144,8 +150,11 @@ function startGame() {
   }
 
   randomizeShips(computerBoard);
+  // hideShips(computerBoard, "computer");
 
   console.log("game started");
+
+  mainMessage.textContent = "Game started. Click on the computer board to fire.";
 
   computerSquares.forEach((square) => {
     // listen for clicks on the computer board
@@ -170,14 +179,20 @@ function playTurn(e) {
 
   if (computerBoard[clickedRow][clickedCol].state === state.EMPTY) {
     console.log("player miss");
+    mainMessage.textContent = "You missed.";
     computerBoard[clickedRow][clickedCol].state = state.MISS;
   } else if (computerBoard[clickedRow][clickedCol].state === state.SHIP) {
     console.log("player hit");
+    mainMessage.textContent = "You hit a ship!";
     computerBoard[clickedRow][clickedCol].state = state.HIT;
   } else {
     console.log("player already clicked here");
+    mainMessage.textContent = "You already clicked here.";
     return;
   }
+
+  // TODO add delay (computer is thinking)
+
 
   // computer turn
 
@@ -195,9 +210,11 @@ function playTurn(e) {
 
   if (playerBoard[randRow][randCol].state === state.EMPTY) {
     console.log("computer miss");
+    secondaryMessage.textContent = "Computer missed.";
     playerBoard[randRow][randCol].state = state.MISS;
   } else if (playerBoard[randRow][randCol].state === state.SHIP) {
     console.log("computer hit");
+    secondaryMessage.textContent = "Computer hit a ship!";
     playerBoard[randRow][randCol].state = state.HIT;
   } else {
     console.log("You idiot, you broke the game");
@@ -271,6 +288,20 @@ function randomizeShips(board) {
   render();
 }
 
+function hideShips(board, computerOrPlayer) {
+  // iterate through the board
+  // if .ship class, add .hidden class
+  for (let i = 0; i < board.length; i++) {
+    for (let j = 0; j < board.length; j++) {
+      const square = document.getElementById(`${computerOrPlayer}-${i}-${j}`);
+      if (board[i][j].state === state.SHIP) {
+        square.classList.add("hidden");
+        console.log(square.classList);
+      }
+    }
+  }
+}
+
 function checkWin(board) {
   let count = 0;
   for (let i = 0; i < board.length; i++) {
@@ -299,6 +330,7 @@ function resetShips(board) {
   render();
 }
 
+
 function render() {
   renderBoard(playerBoard, "player");
   renderBoard(computerBoard, "computer");
@@ -320,6 +352,9 @@ function renderBoard(board, playerOrComputer) {
       if (square.ship !== null) {
         div.classList.add("ship");
         div.classList.add(square.ship.name);
+        if (!cheats && playerOrComputer === "computer") {
+          div.classList.add("hidden");
+        }
         if (square.state === state.HIT) {
           div.classList.add(state.HIT);
         }
@@ -536,6 +571,11 @@ function numOfShips(board) {
     }
   }
   return count;
+}
+
+function cheatsOn() {
+  cheats = true;
+  render();
 }
 
 
