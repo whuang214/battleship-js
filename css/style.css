@@ -24,9 +24,9 @@ body {
 }
 
 .overlay h1 {
-  color: #fff;
+  color: white;
   font-size: 80px;
-  margin-bottom: 300px;
+  margin-bottom: 30vh;
 }
 
 .overlay button {
@@ -105,7 +105,7 @@ body {
 
 .info-container {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: space-evenly;
   width: 100%;
 }
@@ -113,7 +113,7 @@ body {
 .info-container h1 {
   color: #fff;
   font-size: 25px;
-  margin: 0;
+  margin: 5;
   text-align: center;
 }
 

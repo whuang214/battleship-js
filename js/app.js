@@ -229,7 +229,12 @@ function startGame(e) {
  * @returns {void}
  */
 function playTurn(e) {
+
   e.preventDefault();
+
+  if (winner !== 0) {
+    return;
+  }
 
   // player turn
 
@@ -289,16 +294,34 @@ function playTurn(e) {
 
   // win
   if (checkWin(playerBoard)) {
-    alert("Computer Wins!");
     winner = -1;
     return;
   }
   else if (checkWin(computerBoard)) {
-    alert("Player Wins!");
     winner = 1;
     return;
   }
 
+  gameOver();
+
+}
+
+function gameOver() {
+  // TODO add game over screen
+  // TODO unhide play again button
+  if (winner === 1) {
+    mainMessage.textContent = "You win!";
+    mainMessage.style.color = "green";
+    secondaryMessage.textContent = "Game over.";
+  }
+  else if (winner === -1) {
+    mainMessage.textContent = "You lose!";
+    mainMessage.style.color = "red";
+    secondaryMessage.textContent = "Game over.";
+  }
+  else {
+    return;
+  }
 }
 
 function randomizeShips(board) {
