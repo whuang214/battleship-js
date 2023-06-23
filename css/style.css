@@ -25,7 +25,7 @@ body {
 
 .overlay h1 {
   color: white;
-  font-size: 80px;
+  font-size: 7vmin;
   margin-bottom: 30vh;
 }
 
@@ -70,11 +70,16 @@ body {
   margin: 0;
 }
 
-.game-container .board-container .computer-board div .ship,
-.game-container .board-container .player-board div .ship {
+.game-container .board-container .computer-board div.ship,
+.game-container .board-container .player-board div.ship {
   background-color: gray;
+  border-radius: 0px;
   width: 100%;
   height: 100%;
+}
+
+.game-container .board-container .computer-board div.ship.hidden {
+  background-color: transparent;
 }
 
 .game-container .board-container .computer-board div.ship.hit,
@@ -100,7 +105,7 @@ body {
   flex-direction: column;
   justify-content: space-around;
   width: 100%;
-  height: 30vh;
+  height: 35vh;
 }
 
 .info-container {
@@ -112,7 +117,7 @@ body {
 
 .info-container h1 {
   color: #fff;
-  font-size: 25px;
+  font-size: 2.5vmin;
   margin: 5;
   text-align: center;
 }
@@ -159,56 +164,55 @@ body {
   width: 100%;
 }
 
-.ship {
-  width: 40px;
-  height: 40px;
+.ships-container .ship {
+  display: flex;
+  flex-wrap: wrap;
+  width: calc(4.6vmin * var(--width, 1));
+  height: calc(4.6vmin * var(--height, 1));
   background-color: gray;
   border: 0.2px solid rgba(255, 255, 255, 0.3);
-  margin: 2px;
-  /* border-radius: 50px; */
+  margin: 1vmin;
+  border-radius: 2.3vmin;
   cursor: pointer;
 }
 
-.ship.hidden {
-  background-color: transparent;
-}
-
 .carrier.horizontal {
-  width: 200px;
+  --width: 5;
 }
 
 .carrier.vertical {
-  height: 200px;
+  --height: 5;
 }
 
 .battleship.horizontal {
-  width: 160px;
+  --width: 4;
 }
 
 .battleship.vertical {
-  height: 160px;
+  --height: 4;
 }
 
 .cruiser.horizontal {
-  width: 120px;
+  --width: 3;
 }
 
 .cruiser.vertical {
-  height: 120px;
+  --height: 3;
 }
 
 .submarine.horizontal {
-  width: 120px;
+  --width: 3;
 }
 
 .submarine.vertical {
-  height: 120px;
+  --height: 3;
 }
 
 .destroyer.horizontal {
-  width: 80px;
+  --width: 2;
 }
 
 .destroyer.vertical {
-  height: 80px;
+  --height: 2;
 }
+

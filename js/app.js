@@ -51,6 +51,7 @@ class Square {
     this.y = y;
     this.state = state.EMPTY;
     this.ship = null;
+    this.orientation = null;
   }
 }
 
@@ -59,6 +60,7 @@ let playerBoard = []; // the players game board represented as a 2D array of Squ
 let computerBoard = []; // the players game board represented as a 2D array of Square objects
 
 let focusedShip; // the e.target of the ship being interacted with
+let focusedShipOrientation; // the orientation of the ship being interacted with
 
 let cheats = false; // if true, show the computer ships
 
@@ -116,9 +118,11 @@ function renderBoard(board, playerOrComputer) {
       const div = document.getElementById(`${playerOrComputer}-${i}-${j}`);
       // update the dom with the board state
       div.classList.remove(...div.classList);
+      div.classList.add("square");
       if (square.ship !== null) {
         div.classList.add("ship");
         div.classList.add(square.ship.name);
+        div.classList.add(square.orientation);
         if (!cheats && playerOrComputer === "computer") {
           div.classList.add("hidden");
         }
@@ -157,13 +161,14 @@ function initGame() {
   // event listeners
   ships.forEach((ship) => {
     // for each ship listen for the following events
-    ship.addEventListener("dragstart", dragStart);
+    ship.addEventListener("dragstart", dragStartFromContainer);
     ship.addEventListener("keydown", handleKeyPress);
     ship.addEventListener("click", handleClick);
   });
 
   playerSquares.forEach((square) => {
     // for each square on the player board listen for the following events
+    square.addEventListener("dragstart", dragStartFromBoard);
     square.addEventListener("dragover", dragOver);
     square.addEventListener("drop", dragDrop);
   });
@@ -186,7 +191,7 @@ function initGame() {
 
 /**
  * creates a 10x10 2D array of Square objects.
- * @param {array} board - The game board to initialize.
+ * @param {Array<Array<Square>>} board - The game board to initialize.
  */
 function initBoard(board) {
   // if board already exists, clear it
@@ -296,7 +301,6 @@ function playTurn(e) {
     secondaryMessage.textContent = "Computer missed.";
     secondaryMessage.style.color = "yellow";
     playerBoard[randRow][randCol].state = state.MISS;
-    
   } else if (playerBoard[randRow][randCol].state === state.SHIP) {
     // console.log("computer hit");
     secondaryMessage.textContent = "Computer hit a ship!";
@@ -320,6 +324,10 @@ function playTurn(e) {
   }
 }
 
+/**
+ * Resets the game by clearing the game board and re-initializing the game.
+ * @returns {void}
+ */
 function resetGame() {
   resetShips(playerBoard);
   resetShips(computerBoard);
@@ -328,6 +336,10 @@ function resetGame() {
   initGame();
 }
 
+/**
+ * Game over function that displays the winner and a play again button.
+ * @returns {void}
+ */
 function gameOver() {
   console.log("game over");
   // TODO add game over screen
@@ -345,6 +357,11 @@ function gameOver() {
   replayButton.style.display = "block";
 }
 
+/**
+ * Randomizes the placement of all ships on the board.
+ * @param {Array<Array<Square>>} board The game board to randomize the ships on.
+ * @returns {void}
+ */
 function randomizeShips(board) {
   // reset all ships board
   resetShips(board);
@@ -387,74 +404,80 @@ function randomizeShips(board) {
   render();
 }
 
-function hideShips(board, computerOrPlayer) {
-  // iterate through the board
-  // if .ship class, add .hidden class
-  for (let i = 0; i < board.length; i++) {
-    for (let j = 0; j < board.length; j++) {
-      const square = document.getElementById(`${computerOrPlayer}-${i}-${j}`);
-      if (board[i][j].state === state.SHIP) {
-        square.classList.add("hidden");
-        console.log(square.classList);
-      }
-    }
-  }
-}
-
-function checkWin(board) {
-  let count = 0;
-  for (let i = 0; i < board.length; i++) {
-    for (let j = 0; j < board[i].length; j++) {
-      if (board[i][j].state === state.HIT) {
-        count++;
-      }
-    }
-  }
-  // console.log(count);
-  return count === 17;
-}
-
-function resetShips(board) {
-  // iterate through the player board
-  // reset the state of each square to empty
-  // reset the ship of each square to null
-
-  for (let i = 0; i < board.length; i++) {
-    for (let j = 0; j < board[i].length; j++) {
-      board[i][j].state = state.EMPTY;
-      board[i][j].ship = null;
-    }
-  }
-
-  render();
-}
-
-function rotateShip() {
-  if (focusedShip.classList.contains("horizontal")) {
-    focusedShip.classList.remove("horizontal");
-    focusedShip.classList.add("vertical");
-  } else {
-    focusedShip.classList.remove("vertical");
-    focusedShip.classList.add("horizontal");
-  }
-}
-
 // drag and drop functions
-function dragStart(e) {
+/**
+ * Drag start function for when a ship is dragged from the container.
+ * @param {Event} e the event object 
+ */
+function dragStartFromContainer(e) {
   if (focusedShip) {
     focusedShip.style.border = "none";
   }
+  if (e.target.classList.contains("ship")) {
+    e.target.style.border = "2px solid black";
+  }
   focusedShip = e.target;
+  if (e.target.classList.contains("horizontal")) {
+    focusedShipOrientation = "horizontal";
+  }
+  else if (e.target.classList.contains("vertical")) {
+    focusedShipOrientation = "vertical";
+  }
+  // console.log(focusedShip);
 }
 
+/**
+ * Drag start function for when a ship is dragged from the board.
+ * @param {Event} e the event object 
+ */
+function dragStartFromBoard(e) {
+  // if e.target is a square and has a ship, set focusedShip the corresponding ship in ships
+  if (e.target.classList.contains("ship")) {
+    // if a grid sqaure is dragged
+    for (let ship of ships) {
+      const shipClassNames = ship.className.split(" ");
+      const targetClassNames = Array.from(e.target.classList);
+      const filteredTargetClassNames = targetClassNames.filter(
+        (className) => 
+        className !== "ship" && 
+        className !== "vertical" &&
+        className !== "horizontal"
+      );
+      const matchingClass = shipClassNames.find((className) =>
+        filteredTargetClassNames.includes(className)
+      );
+
+      if (matchingClass) {
+        focusedShip = ship;
+        if (e.target.classList.contains("horizontal")) {
+          focusedShipOrientation = "horizontal";
+        }
+        else if (e.target.classList.contains("vertical")) {
+          focusedShipOrientation = "vertical";
+        }
+        break;
+      }
+    }
+  }
+}
+
+/**
+ * Drop function for when a ship is dropped on the board.
+ * @param {Event} e the event object 
+ * @returns {void}
+ */
 function dragDrop(e) {
   e.preventDefault();
+
+  if (focusedShip) {
+    focusedShip.style.border = "none";
+  }
 
   const square = e.target;
   const row = parseInt(square.id.split("-")[1]);
   const column = parseInt(square.id.split("-")[2]);
 
-  const shipOrientation = focusedShip.classList[2];
+  const shipOrientation = focusedShipOrientation;
   const shipLength = lengthOfShip(focusedShip.classList[1]);
 
   for (let i = 0; i < shipLength; i++) {
@@ -492,6 +515,7 @@ function dragDrop(e) {
       if (playerBoard[i][j].ship === findShip(focusedShip.classList[1])) {
         playerBoard[i][j].ship = null;
         playerBoard[i][j].state = state.EMPTY;
+        playerBoard[i][j].orientation = null;
       }
     }
   }
@@ -500,17 +524,16 @@ function dragDrop(e) {
     if (shipOrientation === "horizontal") {
       playerBoard[row][column + i].ship = findShip(focusedShip.classList[1]);
       playerBoard[row][column + i].state = state.SHIP;
+      playerBoard[row][column + i].orientation = shipOrientation;
     } else if (shipOrientation === "vertical") {
       // vertical
       playerBoard[row + i][column].ship = findShip(focusedShip.classList[1]);
       playerBoard[row + i][column].state = state.SHIP;
+      playerBoard[row + i][column].orientation = shipOrientation;
     } else {
-      console.log("What kind of edge case is this?");
+      console.log("there is no ship orientation");
     }
   }
-
-  // e.target.appendChild(focusedShip);
-
   render();
 }
 
@@ -524,7 +547,7 @@ function dragOver(e) {
  * @param {KeyboardEvent} e - The keyboard event.
  */
 function handleKeyPress(e) {
-  console.log(e.key);
+  // console.log(e.key);
 
   if (e.key === "r") {
     rotateShip();
@@ -544,11 +567,72 @@ function handleClick(e) {
   }
   // console.log(e.target);
   focusedShip = e.target;
+  focusedShipOrientation = e.target.classList[2];
   focusedShip.style.border = "2px solid black";
   focusedShip.focus();
 }
 
 // helper functions
+
+
+/**
+ * Checks if all the ships have a hit state.
+ * @param {Array<Array<Square>>} board the game board to check.
+ * @returns {boolean} true if all ships have a hit state, false otherwise.
+ */
+function checkWin(board) {
+  let count = 0;
+  for (let i = 0; i < board.length; i++) {
+    for (let j = 0; j < board[i].length; j++) {
+      if (board[i][j].state === state.HIT) {
+        count++;
+      }
+    }
+  }
+  // console.log(count);
+  return count === 17;
+}
+
+/**
+ * Resets the ships on the board.
+ * @param {} board 
+ */
+function resetShips(board) {
+  // iterate through the player board
+  // reset the state of each square to empty
+  // reset the ship of each square to null
+
+  for (let i = 0; i < board.length; i++) {
+    for (let j = 0; j < board[i].length; j++) {
+      board[i][j].state = state.EMPTY;
+      board[i][j].ship = null;
+    }
+  }
+
+  if (focusedShip) {
+    focusedShip.style.border = "none";
+    focusedShip = null;
+  }
+
+  render();
+}
+
+/**
+ * rotates the focused ship
+ * @returns {void}
+ */
+function rotateShip() {
+  if (focusedShip.classList.contains("horizontal")) {
+    focusedShip.classList.remove("horizontal");
+    focusedShip.classList.add("vertical");
+    focusedShipOrientation = "vertical";
+  } else {
+    focusedShip.classList.remove("vertical");
+    focusedShip.classList.add("horizontal");
+    focusedShipOrientation = "horizontal";
+  }
+}
+
 /**
  * Returns the length of the ship based on its name.
  * @param {string} ship - The name of the ship.
@@ -581,6 +665,15 @@ function findShip(name) {
   return allShips[name];
 }
 
+/**
+ * Checks if a ship can be placed on the board.
+ * @param {Ship} ship the ship to place.
+ * @param {String} shipOrientation the orientation of the ship.
+ * @param {Integer} row the row to place the ship.
+ * @param {Integer} column the column to place the ship.
+ * @param {Array<Array<Square>>} board the board to place the ship on.
+ * @returns {boolean} true if the ship can be placed, false otherwise.
+ */
 function canPlaceShip(ship, shipOrientation, row, column, board) {
   for (let i = 0; i < lengthOfShip(ship); i++) {
     if (shipOrientation === "horizontal") {
@@ -606,6 +699,10 @@ function canPlaceShip(ship, shipOrientation, row, column, board) {
   return true;
 }
 
+/**
+ * returns true if all ships are placed, false otherwise.
+ * @returns {boolean} true if all ships are placed, false otherwise.
+ */
 function allShipsPlaced() {
   // iterate through entire playerboard
   // count number of squares that have a ship equal to 5 + 4 + 3 + 3 + 2
@@ -621,6 +718,11 @@ function allShipsPlaced() {
   return count === 17;
 }
 
+/**
+ * returns the number of ships on the board.
+ * @param {Array<Array<Square>>}} board 
+ * @returns {Integer} the number of ships on the board.
+ */
 function numOfShips(board) {
   // returns number of ships on the board
   let count = 0;
@@ -634,6 +736,10 @@ function numOfShips(board) {
   return count;
 }
 
+/**
+ * unhides the computers ships
+ * @returns {void}
+ */
 function cheatsOn() {
   cheats = true;
   render();
