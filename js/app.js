@@ -390,9 +390,11 @@ function randomizeShips(board) {
       if (shipOrientation === "horizontal") {
         board[randomRow][randomColumn + i].ship = allShips[ship];
         board[randomRow][randomColumn + i].state = state.SHIP;
+        board[randomRow][randomColumn + i].orientation = shipOrientation;
       } else {
         board[randomRow + i][randomColumn].ship = allShips[ship];
         board[randomRow + i][randomColumn].state = state.SHIP;
+        board[randomRow + i][randomColumn].orientation = shipOrientation;
       }
     }
   }
@@ -433,6 +435,7 @@ function dragStartFromContainer(e) {
  * @param {Event} e the event object 
  */
 function dragStartFromBoard(e) {
+  // e.preventDefault();
   // if e.target is a square and has a ship, set focusedShip the corresponding ship in ships
   if (e.target.classList.contains("ship")) {
     // if a grid sqaure is dragged
