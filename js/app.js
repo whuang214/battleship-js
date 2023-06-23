@@ -52,6 +52,8 @@ class Square {
     this.state = state.EMPTY;
     this.ship = null;
     this.orientation = null;
+    this.start = null;
+    this.end = null;
   }
 }
 
@@ -123,6 +125,12 @@ function renderBoard(board, playerOrComputer) {
         div.classList.add("ship");
         div.classList.add(square.ship.name);
         div.classList.add(square.orientation);
+        if (square.start) {
+          div.classList.add("start");
+        }
+        if (square.end) {
+          div.classList.add("end");
+        }
         if (!cheats && playerOrComputer === "computer") {
           div.classList.add("hidden");
         }
@@ -390,9 +398,23 @@ function randomizeShips(board) {
       if (shipOrientation === "horizontal") {
         board[randomRow][randomColumn + i].ship = allShips[ship];
         board[randomRow][randomColumn + i].state = state.SHIP;
+        board[randomRow][randomColumn + i].orientation = shipOrientation;
+        if (i === 0) {
+          board[randomRow][randomColumn + i].start = true;
+        }
+        if (i === shipLength - 1) {
+          board[randomRow][randomColumn + i].end = true;
+        }
       } else {
         board[randomRow + i][randomColumn].ship = allShips[ship];
         board[randomRow + i][randomColumn].state = state.SHIP;
+        board[randomRow + i][randomColumn].orientation = shipOrientation;
+        if (i === 0) {
+          board[randomRow + i][randomColumn].start = true;
+        }
+        if (i === shipLength - 1) {
+          board[randomRow + i][randomColumn].end = true;
+        }
       }
     }
   }
@@ -518,6 +540,8 @@ function dragDrop(e) {
         playerBoard[i][j].ship = null;
         playerBoard[i][j].state = state.EMPTY;
         playerBoard[i][j].orientation = null;
+        playerBoard[i][j].start = null;
+        playerBoard[i][j].end = null;
       }
     }
   }
@@ -527,11 +551,23 @@ function dragDrop(e) {
       playerBoard[row][column + i].ship = findShip(focusedShip.classList[1]);
       playerBoard[row][column + i].state = state.SHIP;
       playerBoard[row][column + i].orientation = shipOrientation;
+      if (i === 0) {
+        playerBoard[row][column + i].start = true;
+      }
+      if (i === shipLength - 1) {
+        playerBoard[row][column + i].end = true;
+      }
     } else if (shipOrientation === "vertical") {
       // vertical
       playerBoard[row + i][column].ship = findShip(focusedShip.classList[1]);
       playerBoard[row + i][column].state = state.SHIP;
       playerBoard[row + i][column].orientation = shipOrientation;
+      if (i === 0) {
+        playerBoard[row + i][column].start = true;
+      }
+      if (i === shipLength - 1) {
+        playerBoard[row + i][column].end = true;
+      }
     } else {
       console.log("there is no ship orientation");
     }
@@ -573,8 +609,6 @@ function handleClick(e) {
   focusedShip.style.border = "2px solid black";
   focusedShip.focus();
 }
-
-// helper functions
 
 
 /**
