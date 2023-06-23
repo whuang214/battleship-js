@@ -216,6 +216,9 @@ function initBoard(board) {
  */
 function startGame(e) {
   e.preventDefault();
+
+  winner = 0; // reset the winner
+
   if (allShipsPlaced()) {
     playButton.style.display = "none";
     resetButton.style.display = "none";
@@ -331,7 +334,6 @@ function playTurn(e) {
 function resetGame() {
   resetShips(playerBoard);
   resetShips(computerBoard);
-  winner = 0;
 
   initGame();
 }
