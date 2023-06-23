@@ -2,8 +2,8 @@ console.log("app.js loaded");
 
 /*----- constants -----*/
 
-let winner = 0; // 0 = no winner, 1 = player, -1 = computer
-let started = false; // indicates if the game has started
+let winner; // 0 = no winner, 1 = player, -1 = computer
+let gameStarted; // indicates if the game has started
 
 /**
  * Represents the state of a square on the game board.
@@ -155,6 +155,7 @@ function initGame() {
   initBoard(computerBoard);
 
   cheats = false; // hide the computer ships
+  gameStarted = false; // indicate that the game has not started
 
   // render the game boards
   render();
@@ -219,6 +220,7 @@ function startGame(e) {
   e.preventDefault();
 
   winner = 0; // reset the winner
+  gameStarted = true; // indicate that the game has started
 
   if (allShipsPlaced()) {
     playButton.style.display = "none";
@@ -233,10 +235,10 @@ function startGame(e) {
   randomizeShips(computerBoard);
   // hideShips(computerBoard, "computer");
 
-  console.log("game started");
+  console.log("game gameStarted");
 
   mainMessage.textContent =
-    "Game started. Click on the computer board to fire.";
+    "Game gameStarted. Click on the computer board to fire.";
   secondaryMessage.textContent = "";
   secondaryMessage.style.display = "inline";
 
@@ -476,6 +478,10 @@ function dragStartFromBoard(e) {
  */
 function dragDrop(e) {
   e.preventDefault();
+
+  if (gameStarted) {
+    return;
+  }
 
   if (focusedShip) {
     focusedShip.style.border = "none";
