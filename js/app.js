@@ -235,10 +235,10 @@ function startGame(e) {
   randomizeShips(computerBoard);
   // hideShips(computerBoard, "computer");
 
-  console.log("game gameStarted");
+  console.log("Game Started");
 
   mainMessage.textContent =
-    "Game gameStarted. Click on the computer board to fire.";
+    "Game Started. Click on the computer board to fire.";
   secondaryMessage.textContent = "";
   secondaryMessage.style.display = "inline";
 
