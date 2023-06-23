@@ -3,6 +3,7 @@ console.log("app.js loaded");
 /*----- constants -----*/
 
 let winner = 0; // 0 = no winner, 1 = player, -1 = computer
+let started = false; // indicates if the game has started
 
 /**
  * Represents the state of a square on the game board.
@@ -435,8 +436,10 @@ function dragStartFromContainer(e) {
  * @param {Event} e the event object 
  */
 function dragStartFromBoard(e) {
-  // e.preventDefault();
   // if e.target is a square and has a ship, set focusedShip the corresponding ship in ships
+  if (gameStarted) {
+    return;
+  }
   if (e.target.classList.contains("ship")) {
     // if a grid sqaure is dragged
     for (let ship of ships) {
