@@ -620,6 +620,7 @@ function resetShips(board) {
     for (let j = 0; j < board[i].length; j++) {
       board[i][j].state = state.EMPTY;
       board[i][j].ship = null;
+      board[i][j].orientation = null;
     }
   }
 

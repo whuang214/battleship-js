@@ -78,6 +78,26 @@ body {
   height: 100%;
 }
 
+.game-container .board-container .player-board div.ship.vertical.top {
+  border-top-left-radius: 2.3vmin;
+  border-top-right-radius: 2.3vmin;
+}
+
+.game-container .board-container .player-board div.ship.vertical.bottom {
+  border-bottom-left-radius: 2.3vmin;
+  border-bottom-right-radius: 2.3vmin;
+}
+
+.game-container .board-container .player-board div.ship.horizontal.left {
+  border-top-left-radius: 2.3vmin;
+  border-bottom-left-radius: 2.3vmin;
+}
+
+.game-container .board-container .player-board div.ship.horizontal.right {
+  border-top-right-radius: 2.3vmin;
+  border-bottom-right-radius: 2.3vmin;
+}
+
 .game-container .board-container .computer-board div.ship.hidden {
   background-color: transparent;
 }
