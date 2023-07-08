@@ -2,7 +2,8 @@ console.log("app.js loaded");
 
 /*----- constants -----*/
 
-let winner = 0; // 0 = no winner, 1 = player, -1 = computer
+let winner; // 0 = no winner, 1 = player, -1 = computer
+let gameStarted; // indicates if the game has started
 
 /**
  * Represents the state of a square on the game board.
@@ -162,6 +163,7 @@ function initGame() {
   initBoard(computerBoard);
 
   cheats = false; // hide the computer ships
+  gameStarted = false; // indicate that the game has not started
 
   // render the game boards
   render();
@@ -226,6 +228,7 @@ function startGame(e) {
   e.preventDefault();
 
   winner = 0; // reset the winner
+  gameStarted = true; // indicate that the game has started
 
   if (allShipsPlaced()) {
     playButton.style.display = "none";
@@ -240,10 +243,10 @@ function startGame(e) {
   randomizeShips(computerBoard);
   // hideShips(computerBoard, "computer");
 
-  console.log("game started");
+  console.log("Game Started");
 
   mainMessage.textContent =
-    "Game started. Click on the computer board to fire.";
+    "Game Started. Click on the computer board to fire.";
   secondaryMessage.textContent = "";
   secondaryMessage.style.display = "inline";
 
@@ -399,22 +402,10 @@ function randomizeShips(board) {
         board[randomRow][randomColumn + i].ship = allShips[ship];
         board[randomRow][randomColumn + i].state = state.SHIP;
         board[randomRow][randomColumn + i].orientation = shipOrientation;
-        if (i === 0) {
-          board[randomRow][randomColumn + i].start = true;
-        }
-        if (i === shipLength - 1) {
-          board[randomRow][randomColumn + i].end = true;
-        }
       } else {
         board[randomRow + i][randomColumn].ship = allShips[ship];
         board[randomRow + i][randomColumn].state = state.SHIP;
         board[randomRow + i][randomColumn].orientation = shipOrientation;
-        if (i === 0) {
-          board[randomRow + i][randomColumn].start = true;
-        }
-        if (i === shipLength - 1) {
-          board[randomRow + i][randomColumn].end = true;
-        }
       }
     }
   }
@@ -456,6 +447,9 @@ function dragStartFromContainer(e) {
  */
 function dragStartFromBoard(e) {
   // if e.target is a square and has a ship, set focusedShip the corresponding ship in ships
+  if (gameStarted) {
+    return;
+  }
   if (e.target.classList.contains("ship")) {
     // if a grid sqaure is dragged
     for (let ship of ships) {
@@ -492,6 +486,10 @@ function dragStartFromBoard(e) {
  */
 function dragDrop(e) {
   e.preventDefault();
+
+  if (gameStarted) {
+    return;
+  }
 
   if (focusedShip) {
     focusedShip.style.border = "none";
