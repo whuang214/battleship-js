@@ -3,7 +3,6 @@
 JavaScript representation of the classic board game where players engage in a naval battle by strategically placing their ships on a grid and attempting to sink their opponent's fleet
 
 ## Screenshots
-![Splash Screen](https://i.imgur.com/cqkmPSB.png)
 ![Main Screen](https://i.imgur.com/AHq0iML.png)
 
 ## Technologies Used
